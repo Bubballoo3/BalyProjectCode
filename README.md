@@ -2,6 +2,13 @@
 ##### A collection of ready-to-use tools and classes for the Denis Baly Slide Collection
 ***
 ## How to Open and Run in a Terminal
+* ****Download Program****
+    At the top of this (the main) webpage for the project, click the button titled 'Code' and a dropdown will appear. If you do not have a github account, press the option to download it as a zip file, and then unzip it on your computer and put the folder somewhere convenient to find.
+    If you have a github account, you can copy the https link from the dropdown. Then in your terminal, navigate to the folder you would like to put the download in. Then type the following line of code into the command line
+    ```sh
+    git clone pastedhttpslink
+    ```
+    it will then prompt you for your github username and password before downloading the folder.
 * ****Navigate to Folder****
 
     Open a terminal window and navigate to the BalyProjectCode folder using the Change Directory (`cd`) command. For example, a terminal on startup will usually start at your user, and on a windows terminal, the prompt may look something like 
