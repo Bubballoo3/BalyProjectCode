@@ -3,7 +3,8 @@
 ***
 ## How to Open and Run in a terminal
 * ****Navigate to Folder****
-    Open a terminal window and navigate to the BalyProjectCode folder using the Change Directory (`cd`) command. For example, a terminal on startup will usually start at your user, and on a windows terminal, the prompt may look something like 
+
+Open a terminal window and navigate to the BalyProjectCode folder using the Change Directory (`cd`) command. For example, a terminal on startup will usually start at your user, and on a windows terminal, the prompt may look something like 
     ```sh
     C: Users/GenericUsername>
     ```
