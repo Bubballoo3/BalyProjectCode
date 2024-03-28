@@ -1,7 +1,7 @@
 # Baly Project Code
 ##### A collection of ready-to-use tools and classes for the Denis Baly Slide Collection
 ***
-## How to Open and Run in a terminal
+## How to Open and Run in a Terminal
 * ****Navigate to Folder****
 
     Open a terminal window and navigate to the BalyProjectCode folder using the Change Directory (`cd`) command. For example, a terminal on startup will usually start at your user, and on a windows terminal, the prompt may look something like 
