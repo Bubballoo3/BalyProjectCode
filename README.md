@@ -66,3 +66,7 @@ Reads a column containing Baly Classifications from an xls file and generates a 
     mapKMLtoXLS('yourkmlfilename','newxlsfilename',"straight")
     ```
     using the same filenames from the previous steps.
+***
+## How to Use addSortingNumbers
+* ****Create Input Spreadsheet****
+    To start, we will need to open our spreadsheet table containing a column of Baly (alphanumeric) classifications. Then start a new spreadsheet, give it a name, and save it in BalyProjectCode as an 'Excel 97-2003 Workbook (.xls)" file. *You should check the file in your system to make sure it is not a .xlsx*. 
