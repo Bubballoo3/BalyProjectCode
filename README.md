@@ -91,4 +91,4 @@ Reads a column containing Baly Classifications from an xls file and generates a 
   ```sh
   addSortingNumbers('inputfilename','resultfilename',worksheetNumber,columnNumber)
   ```
-  where worksheetNumber and columnNumbers are both integer values, with the first worksheet being number 1, and the first column being number 0.
+  where worksheetNumber and columnNumber are both integer values, with the first worksheet being number 1, and the first column being number 0.
