@@ -5,6 +5,7 @@
 * ****Download Program****
 
     At the top of this (the main) webpage for the project, click the button titled 'Code' and a dropdown will appear. If you do not have a github account, press the option to download it as a zip file, and then unzip it on your computer and put the folder somewhere convenient to find.
+  
     If you have a github account, you can copy the https link from the dropdown. Then in your terminal, navigate to the folder you would like to put the download in. Then type the following line of code into the command line
     ```sh
     git clone pastedhttpslink
@@ -95,8 +96,8 @@ Reads a column containing Baly Classifications from an xls file and generates a 
   ```sh
   addSortingNumbers('inputfilename','resultfilename')
   ```
-  Sometimes it is more convenient to read from an original document than to copy-paste into a new input spreadsheet, although it is much more time consuming for the program to read a large spreadsheet compared to one with the one column it needs. If you are doing this, you need to find what worksheet the column you need is in, and the column number (starting from 0) that is the one you need. You then type this code into the command line
+  Sometimes it is more convenient to read from an original document than to copy-paste into a new input spreadsheet, although it is much more time consuming for the program to read a large spreadsheet compared to one with the one column it needs. If you are doing this, you need to find what worksheet the column you need is in (starting from 0), and the column number (starting from 0) that is the one you need. You then type this code into the command line
   ```sh
   addSortingNumbers('inputfilename','resultfilename',worksheetNumber,columnNumber)
   ```
-  where worksheetNumber and columnNumber are both integer values, with the first worksheet being number 1, and the first column being number 0.
+  where worksheetNumber and columnNumber are both integer values, with the first worksheet being number 0, and the first column being number 0.
