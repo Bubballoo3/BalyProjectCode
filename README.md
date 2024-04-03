@@ -2,6 +2,24 @@
 ##### A collection of ready-to-use tools and classes for the Denis Baly Slide Collection
 ***
 ## How to Open and Run in a Terminal
+* ****Install Ruby****
+    Open a terminal window, and type the following commands 
+    ```sh
+    echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.zshrc
+    source ~/.zshrc
+
+    rbenv install 3.3.0
+    rbenv global 3.3.0
+    ```
+
+    Now Ruby version 3.3 should be installed and set as default. To make sure everything is right, type 
+    ```sh
+    ruby -v
+    ```
+    and the output should be something like this 
+    ```sh
+    ruby 3.3.0 (2023-12-25 revision 5124f9ac75) [x86_64-darwin20]
+    ```
 * ****Download Program****
 
     At the top of this (the main) webpage for the project, click the button titled 'Code' and a dropdown will appear. If you do not have a github account, press the option to download it as a zip file, and then unzip it on your computer and put the folder somewhere convenient to find.
