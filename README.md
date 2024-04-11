@@ -20,6 +20,10 @@
     ```sh
     ruby 3.3.0 (2023-12-25 revision 5124f9ac75) [x86_64-darwin20]
     ```
+    Now we install the Spreadsheet package with the command
+    ```sh
+    gem install spreadsheet -v 1.3.0
+    ```
 * ****Download Program****
 
     At the top of this (the main) webpage for the project, click the button titled 'Code' and a dropdown will appear. If you do not have a github account, press the option to download it as a zip file, and then unzip it on your computer and put the folder somewhere convenient to find.
