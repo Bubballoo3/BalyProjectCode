@@ -22,45 +22,6 @@ class String
   end
 end
 
-############### Mapping Functions ################################
-# The first puts together the two main functions above into a simple mapping function
-# the inputfile is a kml filename that has been downloaded from the google Mymaps.
-# the resultfile can be any filename you like ending in .xls. If you don't pass a 
-# resultfile, a (hopefully) unique one will be generated
-# 
-# To try an example, download UnitedKingdom.kml from the github and place it 
-# in the same folder as this file. Then open a terminal and navigate to that 
-# folder with the "cd" command. Once in the correct folder, the terminal should look like 
-#
-# C:\Users\SomeUser\aFolder\...\thisFolder> 
-#
-# Then type "irb" into the command line to start a ruby session.
-#
-# then type "load "kmlParser.rb"". If the terminal returns true, you are done.
-# If it generates an error, you are probably not in the correct folder.
-#
-# Once the file is loaded, just call the mapping function below. For the sample file, that looks like
-#
-# mapKMLtoXLS("UnitedKingdom.kml")
-#
-# If this runs with no errors, there should be a new xls file containing the data in that folder.
-#
-# If an error is encountered, it is probably related to the syntax of the descriptions.
-# The last output before the error should give you the slide number and title of the last one read.
-def mapKMLtoXLS(inputfile,resultfile="blank",mode="CatNum")
-  allinfo=stripInfo inputfile
-  writeToXlsWithClass(allinfo, mode, resultfile)
-end
-
-def addSortingNumbers(inputfile,addAltIDs=false,resultfile="blank",worksheet=0,columnNum=1)
-  indexes=readXLScolumn(inputfile,worksheet,columnNum)
-  sortingNumbers=generateSortingNumbers(indexes, addAltIDs)
-  if addAltIDs
-    writeXLSfromColArray(resultfile,sortingNumbers,["Sorting Number","Baly Index", "VRC Index"])
-  else
-    writeXLSfromColArray(resultfile,[sortingNumbers,indexes],["Sorting Number","Index"])
-  end
-end
 #filename="UnitedKingdom.kml"
 
 #This function reads a kml file and returns a series of hashes containing all the 
