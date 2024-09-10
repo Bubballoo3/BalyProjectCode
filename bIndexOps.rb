@@ -98,27 +98,6 @@ SampleRowHash={"Image ID"=>"A.002","Written Date"=>"June 1970",
 "Precision"=>"likely","Direction"=>"70 degrees E","Object Latitude"=>"35.2354 E","Object Longitude"=>"31.7780 N",
 "written on the slide"=>"Isfahan, Friday Mosque ","written on Baly Index"=>"Friday Mosque "
 }                
-def fillJSON(indexfile,removeEmpty=true,overwrite=true)
-  #we begin by collecting all of the endpoints we will need
-  sheetfields=["Written Date","Printed Date","old identification numbers","Keywords","Search Terms","Internal Links"]
-  overfillerror=InputError.new "metadata nesting exceeded 3 levels and could not be parsed. Check MetaFields hash in bIndexOps.rb"
-  addedFields=parseNestedEndpoints(MetaFields,overfillerror)
-  finalfields=["Image ID"]+sheetfields+addedFields+["JSON"]
-  data=readIndexData(indexfile,0,finalfields,"Hash")
-  newdata=Array.new
-  data.each do |row|
-    newrow=row.values
-    if row[-1].to_s.length < 3 and overwrite==false
-      json=row[-1]
-    else
-      json=writeJSON(row,removeEmpty)
-    end
-    newrow[-1]=json
-    newdata.push newrow
-  end
-  newfilename=generateUniqueFilename("xls","JSONAdded")
-  writeXLSfromRowArray(newfilename,newdata[1..],finalfields)
-end
 
 def writeJSON(rowHash,removeEmpty)
   require 'json'
@@ -411,24 +390,6 @@ def parseNestedEndpoints(nest, errormsg)
   return fieldsarray
 end
                 
-
-def fillImageNotes(indexfile,overwrite=false)
-  fields=["Image ID","Written Date","Printed Date","VRC slide number","old identification numbers","Words written on the slide","Words written on the Baly index","Image Notes"]
-  data=readIndexData(indexfile,0,fields,"Array")
-  newdata=Array.new
-  data.each do |row|
-    newrow=row[..-1]
-    if row[-1].to_s.length > 3 and overwrite == false
-      imNotes=row[-1]
-    else
-      imNotes=writeImageNotes(row[1],row[2],row[3],row[4],row[5],row[6])
-    end
-    newrow[-1]=imNotes
-    newdata.push newrow
-  end
-  newfilename=generateUniqueFilename("xls","ImageNotesAdded")
-  writeXLSfromRowArray(newfilename,newdata[1..],fields)
-end
 
 def assembleKeywords(indexfile, worksheet=0, includeOrigins=true)
   iDSpreadsheetTag= "Image ID"
