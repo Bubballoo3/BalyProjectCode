@@ -31,11 +31,11 @@ def parseSlideRange(string)
       ranges[i] = ranges[i].lfullstrip
     end
     #next we store each B-collection in case the next one reuses it
-    lastcollection="ERROR"
+    lastcollection= "ERROR"
   
     #we now loop through the ranges and process them
     ranges.each do |range|
-      
+      range=range.fullstrip
       #the following will be a sample range to indicate which parts the code is handling
       
       #B22.222-22  
@@ -50,7 +50,7 @@ def parseSlideRange(string)
       
       #B22.222-22
       #^^^
-      if range[0]=="B"
+      if Alphabet.include? range[0]
         lastcollection=range.split('.')[0]
         unless collectionsMentioned.include? lastcollection
           collectionsMentioned.push lastcollection
@@ -63,9 +63,9 @@ def parseSlideRange(string)
         dashplace=rightside.index "-"
       
         if dashplace < 3
-          rightside="0" + rightside
+          rightside= "0" + rightside
           if dashplace < 2
-            rightside="0"+rightside
+            rightside= "0"+rightside
           end
         end
         dashplace=4
@@ -84,19 +84,20 @@ def parseSlideRange(string)
                 i=i%100
             end
           if i.to_s.length < 2
-            ending="0"+i.to_s
+            ending= "0"+i.to_s
           else 
             ending=i.to_s
           end
-          slide=slidestem+ending
+          slide=(slidestem+ending)
           slidesMentioned.push slide
         end
       else 
+        #print "#{rightside}, #{rightside.length} "
         while rightside.length <3
-            rightside="0"+rightside
+          rightside= "0"+rightside
         end
         slide=lastcollection+"."+rightside
-        slidesMentioned.push slide
+        slidesMentioned.push slide.split(" ")[0]
       end
     end
   
@@ -117,10 +118,10 @@ end
 
 
 =begin #The following is a debug routine that allows you to repeatedly test ranges
-s=""
+s= ""
 puts "a debug session has started. enter \"n\" at any time to end it"
 while s != "n"
-  unless s==""
+  unless s== ""
     puts parseSlideRange(s)
   end
   s=gets
@@ -143,8 +144,8 @@ def parseSlideRangeAttempt(string)
   #"B27.012-15, B45.905-06, B47.654-63, 716-18"
   ranges=prepareRanges(string)
   #next we store each B-collection in case the next one reuses it
-  lastcollection="ERROR"
-  thousandslide="NONE"
+  lastcollection= "ERROR"
+  thousandslide= "NONE"
   #we now loop through the ranges and process them
   ranges.each do |range|
     
@@ -157,7 +158,7 @@ def parseSlideRangeAttempt(string)
     else
       #in case it is only 222-22 
       rightside=range
-      leftside="NONE"
+      leftside= "NONE"
     end
     
     #B22.222-22
@@ -165,7 +166,7 @@ def parseSlideRangeAttempt(string)
     
     #B22.222-22
     #       ^
-    unless leftside=="NONE"
+    unless leftside== "NONE"
       lastcollection = getSubcollection(leftside,rightside)
     end
 
@@ -263,7 +264,7 @@ def regularizeRightside(rightside)
   endplace=findendplace(rightside)
   while endplace < 3
     puts endplace
-    rightside="0"+rightside
+    rightside= "0"+rightside
     endplace+=1
   end
   if rightside.include? "-"
@@ -296,11 +297,11 @@ def getCatType(catnum)
   #first we use the prefix of the classification number (the bit before the decimal point) and make 
   # a first guess about the sort. This will allow us to check some more specific conventions for each
   if catnum[0] != "B"
-    hypothesis="Baly"
+    hypothesis= "Baly"
   elsif catnum[1] == "."
-    hypothesis="Baly"
+    hypothesis= "Baly"
   elsif [0,1,2,3,4,5,6,7,8,9].include? catnum.split('.')[1][-1]
-    hypothesis="VRC"
+    hypothesis= "VRC"
   end
   (prefix,suffix)=catnum.split(".")
   
@@ -351,13 +352,14 @@ def getCatType(catnum)
   puts "If its made it this far the slide cannot be sorted"
 end
 =begin #testing code
-testslide="B12.045"
+testslide= "B12.045"
 while testslide != "n"
     testslide=gets
     puts getCatType(testslide)
 end
 =end
-def generateUniqueFilename(filetype="xls",someTitle)
+def generateUniqueFilename(filetype= "xls",someTitle)
+  title=cleanTitle(someTitle)
   time=Time.now
   minutes=time.min
   seconds=time.sec
@@ -365,8 +367,21 @@ def generateUniqueFilename(filetype="xls",someTitle)
   return filename
 end
 
-def generateSortingNumbers(array)
+#this function removes/replaces any characters that are not permitted in filenames
+def cleanTitle(title)
+  title.gsub! "/","-"
+  title.gsub! "?",""
+  title.gsub! ":","-"
+  title.gsub! "*",""
+  return title
+end
+def generateSortingNumbers(array,altIDs=false)
+  if array.class == String
+    array=Array(array)
+  end
   sortingNumbers=Array.new
+  balyIDs=Array.new
+  vrcIDs=Array.new
   array.each do |cat|
     if cat.class == NilClass
       sortingNumbers.append ""
@@ -374,22 +389,34 @@ def generateSortingNumbers(array)
       sortingNumbers.append ""
     elsif Threeletterclassifications.include? cat
       sortingNumbers.append ""
+    elsif altIDs
+      slide=Slide.new(cat)
+      altid=indexConverter(slide.getindex)
+      if altid.class == Classification
+        slide.addAltID(altid)
+      end
+      vrcIDs.push slide.getindex("VRC").to_s
+      balyid=slide.getindex "Baly"
+      balyIDs.push balyid.to_s
+      sortingNumbers.push balyid.sortingNumber
     else
       classification=Classification.new(cat)
-      if classification.classSystem != "Baly"
-        sortingNumbers.append ""
+      if classification.classSystem == "VRC"
+        altId=indexConverter(classification)
+        if altId.class == Classification
+          sortingNumbers.append altId.sortingNumber
+        else
+          sortingNumbers.append 0
+        end
+      else
+        sortingNumbers.append classification.sortingNumber
       end
-      decimalgroup=AllAlphanumerics.index classification.group
-      decimalgroup+=1
-      groupvalue=decimalgroup*1000
-      numvalue=classification.number
-      if numvalue > 1000
-        raise StandardError "Baly Classification dont have #{numvalue} slides. If there's one that does, overhaul the whole system ig :/"
-      end
-      sortingnum=groupvalue+numvalue
-      sortingNumbers.append sortingnum
     end
   end
-  return sortingNumbers
+  if altIDs
+    return [sortingNumbers,balyIDs,vrcIDs]
+  else
+    return sortingNumbers
+  end
 end
 
