@@ -3,8 +3,15 @@
 # These constants may need to be updated, and should periodically be checked for accuracy
 # These constants currently are, in order:
 #   AcceptableAlphanumerics
-#   AllAlphanumerics
+#   Alphabet
 #   BalyMaxNum
+
+# This is the root file of the Baly Project Code, and is loaded into every more complex file. 
+# Thus any functions or methods added should be fully included here and not loaded into more complex files.
+# The full file dependency is as follows:
+# balyClasses => prettyCommonFunctions => indexConverter => kmlParser => indexOps => autoMethods
+#
+# It should be noted that classificationData.rb is only a data store that is automatically loaded by indexConverter
 
 
 
@@ -15,34 +22,21 @@ AcceptableAlphanumerics=[
     "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","AM","AN","AO","AP","AQ","AR","AS","AT","AU","AV","AW","AX","AY","AZ",
     "BA","BB","BC","BD","BE","BF","BG","BH","BI","BJ","BK","BL","BM","BN","BQ","BR","BS","BT","BU","BV","BW","BX","BY","BZ",
     "CA","CB","CC","CD","CE","CF","CG","CH","CI","CJ","CK","CL","CM","CN","CO","CP","CQ","CR","CS","CT","CU","CV","CW","CX","CY","CZ",
-    "DA","DB","DC","DD","DE","DF","DG","DH","DI","DJ","DK","DL","DM","DN","DO","DQ","DR","DS","DU","DV","DW","DX","DY","DZ",
+    "DA","DB","DC","DD","DE","DF","DG","DH","DI","DJ","DK","DL","DM","DN","DO","DQ","DR","DS","DT","DU","DV","DW","DX","DY","DZ",
     "EA","EB","EC","ED","EE","EF","EH","EJ","EK","EM","EN","EJB",
     #Artificial (created for unnumbered slides):
     "FL", #created to categorize the 88 slides at the end of B47 (stands for Fill)
     "XE", #created to allow production of trivial results for numbers VRC index skips. (stands for Non-Existent)
+   "GB", # an unnumbered collection starting at B46.561
+   "LK",
+   "UC", # a collection for slides that were never assigned Baly numbers
+   #tests
+   "ZZ",
+   "AAA"
 ]
 #the next one is an array of all possible alphanumerics up to QZ. This is used for sorting but includes lots of collections Baly didn't use
-AllAlphanumerics=[ 
-    "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
-    "AA","AB","AC","AD","AE","AF","AG","AH","AI","AJ","AK","AL","AM","AN","AO","AP","AQ","AR","AS","AT","AU","AV","AW","AX","AY","AZ",
-    "BA","BB","BC","BD","BE","BF","BG","BH","BI","BJ","BK","BL","BM","BN","BO","BP","BQ","BR","BS","BT","BU","BV","BW","BX","BY","BZ",
-    "CA","CB","CC","CD","CE","CF","CG","CH","CI","CJ","CK","CL","CM","CN","CO","CP","CQ","CR","CS","CT","CU","CV","CW","CX","CY","CZ",
-    "DA","DB","DC","DD","DE","DF","DG","DH","DI","DJ","DK","DL","DM","DN","DO","DP","DQ","DR","DS","DT","DU","DV","DW","DX","DY","DZ",
-    "EA","EB","EC","ED","EE","EF","EG","EH","EI","EJ","EK","EL","EM","EN","EO","EP","EQ","ER","ES","ET","EU","EV","EW","EX","EY","EZ",
-    "FA","FB","FC","FD","FE","FF","FG","FH","FI","FJ","FK","FL","FM","FN","FO","FP","FQ","FR","FS","FT","FU","FV","FW","FX","FY","FZ",
-    "GA","GB","GC","GD","GE","GF","GG","GH","GI","GJ","GK","GL","GM","GN","GO","GP","GQ","GR","GS","GT","GU","GV","GW","GX","GY","GZ",
-    "HA","HB","HC","HD","HE","HF","HG","HH","HI","HJ","HK","HL","HM","HN","HO","HP","HQ","HR","HS","HT","HU","HV","HW","HX","HY","HZ",
-    "IA","IB","IC","ID","IE","IF","IG","IH","II","IJ","IK","IL","IM","IN","IO","IP","IQ","IR","IS","IT","IU","IV","IW","IX","IY","IZ",
-    "JA","JB","JC","JD","JE","JF","JG","JH","JI","JJ","JK","JL","JM","JN","JO","JP","JQ","JR","JS","JT","JU","JV","JW","JX","JY","JZ",
-    "KA","KB","KC","KD","KE","KF","KG","KH","KI","KJ","KK","KL","KM","KN","KO","KP","KQ","KR","KS","KT","KU","KV","KW","KX","KY","KZ",
-    "LA","LB","LC","LD","LE","LF","LG","LH","LI","LJ","LK","LL","LM","LN","LO","LP","LQ","LR","LS","LT","LU","LV","LW","LX","LY","LZ",
-    "MA","MB","MC","MD","ME","MF","MG","MH","MI","MJ","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT","MU","MV","MW","MX","MY","MZ",
-    "NA","NB","NC","ND","NE","NF","NG","NH","NI","NJ","NK","NL","NM","NN","NO","NP","NQ","NR","NS","NT","NU","NV","NW","NX","NY","NZ",
-    "OA","OB","OC","OD","OE","OF","OG","OH","OI","OJ","OK","OL","OM","ON","OO","OP","OQ","OR","OS","OT","OU","OV","OW","OX","OY","OZ",
-    "PA","PB","PC","PD","PE","PF","PG","PH","PI","PJ","PK","PL","PM","PN","PO","PP","PQ","PR","PS","PT","PU","PV","PW","PX","PY","PZ",
-    "QA","QB","QC","QD","QE","QF","QG","QH","QI","QJ","QK","QL","QM","QN","QO","QP","QQ","QR","QS","QT","QU","QV","QW","QX","QY","QZ",
-    ]
 
+Alphabet=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 #The next constant records the highest number assigned across all the Baly collections.
 # the current highest is in DN at 137. If a higher one is found, change this.
 BalyMaxNum=137
@@ -64,14 +58,84 @@ end
 
 class String
     def is_integer?
-    self.to_i.to_s == self
+        self.to_i.to_s == self
+    end
+    def to_s
+        return self
     end
     def lfullstrip
         temp=self
-        while temp[0].codepoints[0]==32 or temp[0].codepoints[0]==160
-            temp=temp[1..-1]
+        if temp.length > 0
+            while temp[0].codepoints[0]==32 or temp[0].codepoints[0]==160
+                temp=temp[1..-1]
+                if temp.length < 1
+                    return temp  
+                end
+            end
         end
         return temp
+    end
+    def rfullstrip
+        temp=self
+        if temp.length > 0
+            while temp[-1].codepoints[0]==32 or temp[-1].codepoints[0]==160
+                temp=temp[...-1]
+                if temp.length < 1
+                    return temp  
+                end
+            end
+        end
+        return temp
+    end
+    def fullstrip
+        temp=self
+        temp=temp.lfullstrip
+        temp=temp.rfullstrip
+        return temp
+    end
+    def alphValue
+        temp=self
+        length=temp.length
+        sum=0
+        length.times {|i| 
+            exp=length-(i+1)
+            place=temp[i]
+            val=Alphabet.index(place)+1
+            sum=sum+val*(26**exp)
+        }
+        return sum
+    end
+end
+
+class Array
+    def includesAtIndex(string)
+        string=string.downcase
+        indexes=Array.new
+        current=0
+        self.each do |el|
+            if el.downcase.include? string
+                indexes.push current
+            end
+            current+=1
+        end
+        return indexes
+    end
+    def includesCaseAtIndex(string)
+        indexes=Array.new
+        current=0
+        self.each do |el|
+            if el.include? string
+                indexes.push current
+            end
+            current+=1
+        end
+        return indexes
+    end
+end
+
+class Hash
+    def invertible?
+        return self.invert.size==self.size
     end
 end
 
@@ -90,7 +154,7 @@ class Slide
         if id.classSystem == "Baly"
             @Balyid=id
             @VRCid=0
-        elsif id.classSystem=="VRC"
+        elsif id.classSystem== "VRC"
             @Balyid=0
             @VRCid=id
         end
@@ -101,6 +165,9 @@ class Slide
         @generalLocation=0
         @specificLocation=0
         @descriptionNotes=0
+        @city=0
+        @region=0
+        @country=0
     end
     #accessor methods
     def balyGroup()
@@ -112,9 +179,9 @@ class Slide
     #For this accessor, we accept the choice of which indexing is returned.
     #if a choice is not made, we default to the non-zero one or Baly ID 
     def getindex(system=0)
-        if system=="Baly"
+        if system== "Baly"
             return @Balyid
-        elsif system=="VRC"
+        elsif system== "VRC"
             return @VRCid
         else
             [@Balyid,@VRCid].each do |id|
@@ -124,7 +191,26 @@ class Slide
             end
         end
     end
+
+    def getSortNum()
+        return @Balyid.sortingNumber
+    end
+
+    def getCoordinates()
+        if @specificLocation == 0
+            if @generalLocation == 0
+                return "None"
+            else
+                return @generalLocation.coords
+            end
+        else
+            return @specificLocation.coords
+        end
+    end
     
+    def getGeodata
+        return [@city,@region,@country]
+    end
     def title()
         return @title
     end
@@ -156,7 +242,7 @@ class Slide
             else
                 raise StandardError.new "This slide has already been given a Baly ID. Once identification numbers are given, they cannot be changed."
             end
-        elsif id.classSystem=="VRC"
+        elsif id.classSystem== "VRC"
             if @VRCid==0
                 @VRCid=id
             else
@@ -208,25 +294,24 @@ class Classification
             @input=classnumber
             (@group,rightside)=classnumber.split(".")
             @number=rightside.to_i
-            stringnum=rightside.split(" ")[0]
         elsif classnumber.class == Array and classnumber.length == 2
             @input=classnumber
             (@group,@number) = classnumber
-            stringnum=@number.to_s
-            while stringnum.length < 3
-                stringnum = '0'+stringnum
-            end
         else #if the input is not readable, we print a warning, and raise an error
             raise ClassificationError.new "#{classnumber} is not a valid Classification object"
+        end
+        stringnum=@number.to_s
+        while stringnum.length < 3
+            stringnum = '0'+stringnum
         end
         @stringform=@group+'.'+stringnum
         #the next part will make an attempt to identify the classification system. 
         # we already have a function that will do this, getCatType, but this is too bulky to be 
         # automatically called each time. This version is weaker, but quicker.
         if @group[0] == "B" and @group[-1].is_integer?
-            @classSystem='VRC'
+            @classSystem= 'VRC'
         elsif AcceptableAlphanumerics.include? @group
-            @classSystem="Baly"
+            @classSystem= "Baly"
         else
             raise PrefixError.new "The Prefix #{@group} does not match any recorded collection. 
             Check for typos in your entry or amend AcceptableAlphanumerics"
@@ -243,10 +328,24 @@ class Classification
     def number()
         return @number
     end
+    def sortingNumber()
+        if self.classSystem != "Baly"
+            return 0
+        end
+        decimalgroup=self.group.alphValue
+        groupvalue=decimalgroup*1000
+        numvalue=self.number
+        if numvalue > 1000
+            raise StandardError "Baly Classification dont have #{numvalue} slides. If there's one that does, overhaul the whole system ig :/"
+        end
+        sortingnum=groupvalue+numvalue
+        return sortingnum
+    end
+
     def stringNum()
         num=@number.to_s
         while num.length < 3
-            num="0"+num
+            num= "0"+num
         end
         return num
     end
@@ -265,7 +364,11 @@ class Classification
             #rather than generate the whole range as a list, we see if it is between the range limits
             (leftside,rightside)=range.split("-")
             (rgroup,lownum)=leftside.split(".")
-            hundreds=lownum[0]
+            if lownum.length<3
+                hundreds= '0'
+            else
+                hundreds=lownum[0]
+            end
             start=lownum.to_i
             if rightside.length < 3
                 rightside=hundreds+rightside
@@ -293,6 +396,7 @@ class Location
     end
     #other methods
     def parseLocationArray(input)
+        print input
         tuple=input[0]
         data=input[1]
         arrlength=input.length
@@ -343,7 +447,7 @@ class SpecificLocation < Location
         elsif data.class==Array
             attributes=data[0..-1]
         end
-        @angle=Angle.new(attributes[0])
+        @angle=Angle.new(attributes[0],self)
         @precision=attributes[1]
     end
     def precision()
@@ -356,18 +460,30 @@ class SpecificLocation < Location
         return @title
     end
     def getAttributesFromString(stringin)
-        (precisiondata,angledata)=stringin.split(" at ")
-        print precisiondata,angledata
-        if precisiondata.include? "location"
-            precision=precisiondata.split(" ")[0].downcase
+        stringin=stringin.downcase
+        if stringin.include?(" at ")
+            (precisiondata,angledata)=stringin.split(" at ")
+            print precisiondata,angledata
+        elsif stringin.include?(" facing ")
+            (precisiondata,angledata)=stringin.split(" facing ")
         else
-            precision="exact"
+            precisiondata= ""
+            angledata=stringin
+        end
+        if precisiondata.include? "location"
+            precision=precisiondata.split(" ")[0]
+        else
+            precision= "exact"
         end
         if angledata.class == NilClass
             raise StandardError.new "input #{stringin} could not be parsed"
         end
         if angledata.include? "degrees"
             angle=angledata
+        elsif angledata.include? "up"
+            angle= "up"
+        elsif angledata.include? "down"
+            angle= "down"
         else
             raise StandardError.new "No angle information was given, so this location cannot be specific."
         end
@@ -375,11 +491,19 @@ class SpecificLocation < Location
     end
     
     class Angle
-        def initialize(stringin)
-            elements=stringin.split(" ")
-            (@degrees,middle,@direction)=elements
-            if middle != "degrees"
-                raise StandardError.new "word \'degrees\' not found/misplaced in angle data"
+        def initialize(stringin,parent)
+            #@parent=parent
+            if ["up","down"].include? stringin
+                (@degrees,@direction)=[-1,stringin]
+            else
+                elements=stringin.split(" ")
+                if elements.length < 3 
+                    raise StandardError.new "Attribute missing for location titled: \"#{parent.title}\""
+                end
+                (@degrees,middle,@direction)=elements
+                if middle != "degrees"
+                    raise StandardError.new "word \'degrees\' not found/misplaced in angle data for location titled: \"#{parent.title}\""
+                end
             end
         end
         def degrees()
@@ -389,7 +513,7 @@ class SpecificLocation < Location
             return @direction
         end
         def to_s() 
-            return @degrees.to_s+" degrees "+@direction
+            return @degrees.to_s+" degrees "+@direction.upcase
         end
     end
 end
@@ -446,8 +570,8 @@ class Subcollection
                 group=@group
                 groupnumber=group[1..].to_i
                 groupnumber+=1
-                @group="B"+groupnumber.to_s
-                @subgroup="0"
+                @group= "B"+groupnumber.to_s
+                @subgroup= "0"
             end
         else
             subgroup=@subgroup.to_i
@@ -459,7 +583,7 @@ class Subcollection
         end
     end
     def isVRC?()
-        if @group[0]=="B" and @group[-1].is_integer?
+        if @group[0]== "B" and @group[-1].is_integer?
             return true
         else
             return false
