@@ -319,9 +319,9 @@ def parseNestedEndpoints(nest, errormsg)
               raise errormsg
             else
               value3.each do |lilkey,value4|
-                if value4.class == String and value4[0] != "= "
+                if value4.class == String and value4[0] != "="
                   fieldsarray.push value4
-                elsif value4[0] != "= "
+                elsif value4[0] != "="
                   raise overfillerror        
                 end
               end
@@ -331,19 +331,19 @@ def parseNestedEndpoints(nest, errormsg)
           value2.each do |key,value3|
             if value3.class == Hash
               value3.each do |key,value4|
-                if value4.class==String and value4[0] != "= "
+                if value4.class==String and value4[0] != "="
                   fieldsarray.push value4
-                elsif value4[0] != "= "
+                elsif value4[0] != "="
                   raise errormsg
                 end
               end
-            elsif value3.class == String and value3[0] != "= "
+            elsif value3.class == String and value3[0] != "="
               fieldsarray.push value3
-            elsif value3[0] != "= "
+            elsif value3[0] != "="
               raise errormsg
             end
           end
-        elsif value2.class==String and value2[0] != "= "
+        elsif value2.class==String and value2[0] != "="
           fieldsarray.push value2
         end
       end
@@ -355,9 +355,9 @@ def parseNestedEndpoints(nest, errormsg)
               raise errormsg
             else
               value3.each do |lilkey,value4|
-                if value4.class == String and value4[0] != "= "
+                if value4.class == String and value4[0] != "="
                   fieldsarray.push value4
-                elsif value4[0] != "= "
+                elsif value4[0] != "="
                   raise errormsg
                 end
               end
@@ -367,29 +367,28 @@ def parseNestedEndpoints(nest, errormsg)
           value2.each do |key,value3|
             if value3.class == Hash
               value3.each do |key,value4|
-                if value4.class==String and value4[0] != "= "
+                if value4.class==String and value4[0] != "="
                   fieldsarray.push value4
-                elsif value4[0] != "= "
+                elsif value4[0] != "="
                   raise errormsg
                 end
               end
-            elsif value3.class == String and value3[0] != "= "
+            elsif value3.class == String and value3[0] != "="
               fieldsarray.push value3
-            elsif value3[0] != "= "
+            elsif value3[0] != "="
               raise errormsg
             end
           end
-        elsif value2.class==String and value2[0] != "= "
+        elsif value2.class==String and value2[0] != "="
           fieldsarray.push value2
         end
       end
-    elsif value.class == String and value[0] != "= "
+    elsif value.class == String and value[0] != "="
       fieldsarray.push value
     end
   end
   return fieldsarray
-end
-                
+end                
 
 def assembleKeywords(indexfile, worksheet=0, includeOrigins=true)
   iDSpreadsheetTag= "Image ID"
