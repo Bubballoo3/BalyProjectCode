@@ -23,6 +23,11 @@ def parseSlideRange(string)
     if string.include? ". "
         n=string.index ". "
         string=string[...n]
+    elsif string.include? ". "
+        n=string.index ". "
+        string=string[...n]
+    elsif string[-1]=="."
+        string=string[...-1]
     end
   
     ranges=string.split(",",-1)
