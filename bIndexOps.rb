@@ -188,7 +188,7 @@ def fillHashFromRow(structure,rowHash,removeEmpty=false)
   autofilled=0
   structure.each do |key,value|
     nonempty=(rowHash[value].to_s.length > 0 and rowHash[value].to_s.fullstrip!= "-")
-    if value[0]== "= "
+    if value[0]== "="
       autofilled+=1
       filled[key]=value[1..]
     elsif nonempty or removeEmpty==false 
@@ -210,7 +210,7 @@ def fillArrayFromRow(structure,rowHash,removeEmpty=false)
   autofilled=0
   structure.each do |value|
     nonempty=(rowHash[value].to_s.length > 0 and rowHash[value].to_s.fullstrip!= "-")
-    if value[0]== "= "
+    if value[0]== "="
       autofilled+=1
       filled.push value[1..]
     elsif nonempty or removeEmpty==false

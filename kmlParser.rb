@@ -52,9 +52,11 @@ def stripInfo(kmlFilename)
   index=0
   cordnum=0
 #read file one line at a time (master loop)
-  File.readlines(file).each do |line|
+  File.readlines(file).each do |rawline|
     #we begin by collecting all the important file and collection info and putting it into an array
 
+    #first we clean any non-standard space characters out of the string
+    line=rawline.cleanSpaces
     #Our first task is to collect the title of each entry
     #every title includes "<name>" and ends with "<\name>"
     if line.include? "<name>" and header==false
@@ -326,7 +328,7 @@ def stripData(desc)
     lastnum=-1
     if desc.include? ". "
       sentences=desc.split(". ")[1..]
-      notes=''
+      notes= ''
       if sentences.length > 1
         sentences.each do |item|
           notes+=item

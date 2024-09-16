@@ -23,9 +23,6 @@ def parseSlideRange(string)
     if string.include? ". "
         n=string.index ". "
         string=string[...n]
-    elsif string.include? ". "
-        n=string.index ". "
-        string=string[...n]
     elsif string[-1]=="."
         string=string[...-1]
     end
@@ -43,7 +40,7 @@ def parseSlideRange(string)
       range=range.fullstrip
       #the following will be a sample range to indicate which parts the code is handling
       
-      #B22.222-22  
+      #B22.222-22
       #   ^
       if range.include? "."
         rightside=range.split(".")[1]

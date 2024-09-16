@@ -105,6 +105,13 @@ class String
         }
         return sum
     end
+
+    def cleanSpaces
+        # Define a regex pattern to match non-standard space characters
+        non_standard_spaces = /[\u00A0\u2000-\u200B\u202F\u205F\u3000]/
+        # Use gsub to replace non-standard spaces with standard spaces
+        self.gsub(non_standard_spaces, ' ')
+    end
 end
 
 class Array
