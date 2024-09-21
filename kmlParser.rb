@@ -179,7 +179,7 @@ def splitLocations (stringLocation)
 end 
 
 
-def writeToXlsWithClass(bigarray, mode="straight", filename="blank")
+def writeToXlsWithClass(bigarray, mode="straight", filename="blank",fillBlanks=true)
   #this function makes heavy use of the spreadsheet package. To install, type "gem install spreadsheet" into your terminal (windows)
   # or visit the source at https://rubygems.org/gems/spreadsheet/versions/1.3.0?locale=en
   require "spreadsheet" 
@@ -237,6 +237,7 @@ def writeToXlsWithClass(bigarray, mode="straight", filename="blank")
 
   if mode == "CatNum"
     seenSlides=Hash.new
+    #Loop through the array
     bigarray[1].length.times do |index|
       title= bigarray[1][index]
       desc = bigarray[2][index]
@@ -284,7 +285,19 @@ def writeToXlsWithClass(bigarray, mode="straight", filename="blank")
     #populate spreadsheet
     formatspreadsheet(mainsheet)
     slides=seenSlides.values.sort_by {|slide| slide.getindex.to_s}
+    lastslide=slides[0].getindex.number
+    currentGroup=slides[0].getindex.group
     slides.each do |slide|
+      number=slide.getindex.number
+      if number > lastslide+1 and fillBlanks
+        (number-(lastslide+1)).times do |i|
+          thisclassification=Classification.new([currentGroup,lastslide+i+1])
+          mainsheet[lastblock,0]=thisclassification.sortingNumber
+          mainsheet[lastblock,2]=thisclassification.to_s
+          lastblock+=1
+        end
+      end
+      lastslide=number
       #slide.addGeodata
       slideData=formatSlideData(slide)
       for i in [0..slideData.length]

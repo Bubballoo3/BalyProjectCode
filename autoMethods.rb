@@ -29,9 +29,9 @@ load 'bIndexOps.rb'
 # If an error is encountered, it is probably related to the syntax of the descriptions.
 # The last output before the error should give you the slide number and title of the last one read.
 
-def mapKMLtoXLS(inputfile,resultfile="blank",mode="CatNum")
+def mapKMLtoXLS(inputfile,fillBlanks=true,resultfile="blank",mode="CatNum")
   allinfo=stripInfo inputfile
-  writeToXlsWithClass(allinfo, mode, resultfile)
+  writeToXlsWithClass(allinfo, mode, resultfile, fillBlanks)
 end
 
 def addSortingNumbers(inputfile,resultfile="blank",worksheet=0,columnNum=1)
