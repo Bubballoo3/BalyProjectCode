@@ -67,22 +67,34 @@
 ## Current Methods
 #### Keywords Tool
 An HTML page that allows for easy creation and analysis of keyword lists
+
 [Instructions](#how-to-use-keywords-tool)
 
 #### mapKMLtoXLS
 Reads a kml file downloaded from a Google MyMaps Project (such as Baly Locations), sorts the location data by slide, and produces a xls file with all the info.
 
+[Instructions](#how-to-use-mapkmltoxls)
+
 #### addSortingNumbers
 Reads a column containing Baly Classifications from an xls file and generates a column with the corresponding sorting numbers for each row.
+
+[Instructions](#how-to-use-addsortingnumbers)
 
 #### fillJSON
 Reads a spreadsheet and generates the JSON necessary for use in the Baly Gallery website
 
+[Instructions](#how-to-use-filljson)
+
 #### fillImageNotes
 Reads a spreadsheet and generates the Image Notes field for each slide, a formulaic summary of creation date and documented info.
 
+[Instructions](#how-to-use-fillimagenotes)
+
 #### formatReferences
 Reads a spreadsheet row of Chicago formatted references and generates an HTML version to be included on Digital Kenyon
+
+[Instructions](#how-to-use-formatreferences)
+
 ***
 
 ## How to use Keywords Tool
