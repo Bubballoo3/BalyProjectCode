@@ -65,6 +65,9 @@
 ***
 
 ## Current Methods
+#### Keywords Tool
+An HTML page that allows for easy creation and analysis of keyword lists
+
 #### mapKMLtoXLS
 Reads a kml file downloaded from a Google MyMaps Project (such as Baly Locations), sorts the location data by slide, and produces a xls file with all the info.
 
@@ -81,6 +84,20 @@ Reads a spreadsheet and generates the Image Notes field for each slide, a formul
 Reads a spreadsheet row of Chicago formatted references and generates an HTML version to be included on Digital Kenyon
 ***
 
+## How to use Keywords Tool
+* ****Open file from folder****
+  Open the balyProjectCode folder and click on the file "keywords.html". A webpage will open in the browser and a single textbox will appear.
+* ****Paste Keywords****
+  Open the Baly Slide Index and select the entire keywords column by clicking on the bar above it. You can deselect the header row if you like, then copy the selection. Return to the Keyword Tool tab and either press "Paste and Go" or paste into the textbox and press the "Go" button at the bottom.
+
+* ****Write Keywords****
+  As you type a keyword into the searchbar, it will search the existing keywords and show the top results. You can click these results to add them to a running list, or press enter to add the top result. If the keyword you would like to add does not exist, continue typing until no results appear. Then pressing enter will add the word to the list, and make it available for subsequent searches.
+
+* ****Export to Spreadsheet****
+  When the list is complete, press the copy button on top of the list to copy it to your clipboard. Reopen the Baly Slide Index and paste it into the Keywords cell of the corresponding slide. When you begin the next slide, you can press the red button at the top of the list to clear it.
+
+* ****Bugs****
+  Note that you may encounter the problem of trying to add a keyword that is contained by another keyword (eg. adding "Word" when "Keyword" already exists). To add these words, complete the list without it and export it to the Index. Add the missing word back in, refresh the Keyword Tool and recopy the keywords row with the new word included.
 
 ## How to Use mapKMLtoXLS
 * ****Download kml file from MyMaps****
