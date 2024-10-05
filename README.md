@@ -67,7 +67,7 @@
 ## Current Methods
 #### Keywords Tool
 An HTML page that allows for easy creation and analysis of keyword lists
-[Instructions](#How to use Keywords Tool)
+[Instructions](#how-to-use-keywords-tool)
 
 #### mapKMLtoXLS
 Reads a kml file downloaded from a Google MyMaps Project (such as Baly Locations), sorts the location data by slide, and produces a xls file with all the info.
