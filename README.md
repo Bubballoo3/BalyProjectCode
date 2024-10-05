@@ -67,6 +67,7 @@
 ## Current Methods
 #### Keywords Tool
 An HTML page that allows for easy creation and analysis of keyword lists
+[Instructions](#How to use Keywords Tool)
 
 #### mapKMLtoXLS
 Reads a kml file downloaded from a Google MyMaps Project (such as Baly Locations), sorts the location data by slide, and produces a xls file with all the info.
@@ -102,7 +103,7 @@ Reads a spreadsheet row of Chicago formatted references and generates an HTML ve
 
 * ****Bugs****
 
-  Note that you may encounter the problem of trying to add a keyword that is contained by another keyword (eg. adding "Word" when "Keyword" already exists). To add these words, complete the list without it and export it to the Index. Add the missing word back in, refresh the Keyword Tool and recopy the keywords row with the new word included.
+  Note that you may encounter the problem of trying to add a keyword that is contained by another keyword (eg. adding "Word" when "Keyword" already exists). To add these words, complete the list without it and export the list to the Index. Add the missing word directly into the cell, refresh the Keyword Tool and recopy the keywords column with the new word included.
 
 ## How to Use mapKMLtoXLS
 * ****Download kml file from MyMaps****
