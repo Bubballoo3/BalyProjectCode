@@ -120,6 +120,7 @@ class Array
         indexes=Array.new
         current=0
         self.each do |el|
+            el=el.to_s
             if el.downcase.include? string
                 indexes.push current
             end

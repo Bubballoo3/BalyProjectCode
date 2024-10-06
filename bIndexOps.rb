@@ -63,9 +63,56 @@ class String
   def fillable?
     return false
   end
+
+  def hyperlink?
+  string=self
+  # Regular expression to match a viable hyperlink
+  regex = /\A(http|https):\/\/[^\s$.?#].[^\s]*\z/i
+  # Check if the string matches the regular expression
+  !!(string =~ regex)
+  end
 end
 class InputError < StandardError
 end
+
+def formatReferences(xlsfile='input.xls')
+  fields=["References","HTML formatted"]
+  begin
+    data=readIndexData(xlsfile,0,fields,"Array")
+  rescue
+    data=readIndexData(xlsfile,0,["References"],"Array")
+  end
+
+  htmlArray=Array.new
+  data.each do |row|
+    newrow=[row[0]]
+    print row[0]
+    print "\n"
+    eachref=String.new
+    row[0].split(" ; ").each do |firstitem|
+      firstitem.split(" , ").each do |item|
+        eachitem= "<p>"
+        item.split(" ").each do |word|
+          thisword=String.new
+          if word.hyperlink?
+            thisword = "<a href='#{word}'> #{word} </a>"
+          else
+            thisword = word
+          end
+          eachitem+= " "+thisword
+        end
+        eachitem+=" </p>"
+        eachref+=eachitem
+      end
+    end
+    newrow.push eachref
+    htmlArray.push newrow
+  end
+
+  newfilename=generateUniqueFilename("xls","HtmlReferenced")
+  writeXLSfromRowArray(newfilename,htmlArray[1..],fields)
+end
+
 #First a hash of metadata fields and how to find them in the spreadsheet.
 #Dates, old numbers, and keywords are fixed since they require parsing. 
 #Fields listed below are pulled from the spreadsheet with no modification.
