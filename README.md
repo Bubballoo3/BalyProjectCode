@@ -168,3 +168,33 @@ Reads a spreadsheet row of Chicago formatted references and generates an HTML ve
   addSortingNumbers('inputfilename','resultfilename',worksheetNumber,columnNumber)
   ```
   where worksheetNumber and columnNumber are both integer values, with the first worksheet being number 0, and the first column being number 0.
+
+***
+### Generating an Input.xls
+The rest of the methods require the data in .xls format, so it will be helpful to keep one in the BalyProjectCode folder and reuse it. Follow these instructions to make it.
+* ****Open a blank new excel document****, and immediately save it as "Input". In the save options, select Excel 97-2003 (xls) and save it to the BalyProjectCode folder. Open the folder and ensure it is saved as a .xls. Then reopen it and select the entire sheet by clicking in the top left corner. Change the cell format for this selection from 'General' to 'Text'.
+
+* ****Copy Data from Index****
+Open the Baly Slide Index Google sheet, and copy the header row from the top. Paste this into the top row of Input.xls. Then copy and paste the rows you would like to work on. Note that methods working on input.xls should be resistant to input errors, so the inclusion of incomplete rows as part of the selection is ok. However you should be careful not to copy incomplete derived data back to the Index.
+
+* ****Save and close Input.xls****
+
+***
+## How to use fillJSON
+* ****Generate Input.xls**** using the [instructions here.](#generating-an-inputxls) If you have an existing Input.xls, clear the contents and double-check it is formatted as text.
+
+* ****Use the method****
+    Open and prepare a terminal using the instructions at the top of the page. Then enter 
+    ```sh 
+    fillJSON('input.xls') 
+    ``` 
+    This will read the info from Input.xls and generate a new spreadsheet titled "JSONaddedXXXX.xls, where XXXX is a number sequence tied to the minute and second it was produced. 
+
+* ****Verify Correctness and Export****
+Open the JSONadded sheet and widen the JSON column so that the data is readable. Then make sure that nothing looks incomplete by comparing it to existing JSON records (those in A: Jerusalem are good examples). Pay particular attention to the dates, and make sure it corresponds with the input data. When the data looks good, copy the JSON column from the JSONadded file and paste it into the corresponding cells in the Baly Slide Index.
+
+***
+## How to use fillImageNotes
+
+
+## How to use formatReferences
