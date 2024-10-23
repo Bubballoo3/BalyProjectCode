@@ -1,0 +1,177 @@
+# Project Dependencies
+
+This document outlines the dependencies between Ruby files and functions within the project. Understanding these dependencies is crucial for maintaining and updating the codebase, especially when migrating to a new Ruby version or making changes to the base files. Full usage documentation is contained in [README.md](README.md)
+
+## External Dependecies
+- `'json'` gem
+- `'spreadsheet'` gem
+
+## File: `autoMethods.rb`
+
+- **Description** Contains the top-level functions regularly accessed by the user.
+
+#### Functions
+- #### `mapKMLtoXLS`
+  - **Dependencies**: 
+    - Calls `stripInfo` from `kmlParser.rb` to process the input KML file.
+    - Calls `writeToXlsWithClass` from `kmlParser.rb` to write the processed data to an XLS file.
+  - **Description**: Converts a KML file into an XLS file. The function can operate in different modes, such as "CatNum" for categorized numbers or "straight" for direct transcription.
+
+- #### `addSortingNumbers`
+  - **Dependencies**: 
+    - Calls `readXLScolumn` from `bIndexOps.rb` to read data from an Excel file.
+    - Calls `generateSortingNumbers` from `autoMethods.rb` to create sorting numbers based on the input data.
+    - Calls `writeXLSfromArray` from `bIndexOps.rb` to write the sorting numbers and indexes to an Excel file.
+  - **Description**: Reads data from an Excel file, generates sorting numbers, and writes the results to another Excel file.
+
+- #### `fillJSON`
+  - **Dependencies**: 
+    - Calls `parseNestedEndpoints` from `autoMethods.rb` to parse nested endpoints from MetaFields.
+    - Calls `readIndexData` from `bIndexOps.rb` to read data from an index file.
+    - Calls `writeJSON` from `bIndexOps.rb` to write JSON data.
+    - Calls `generateUniqueFilename` from `prettyCommonFunctions.rb` to create a unique filename.
+    - Calls `writeXLSfromRowArray` from `bIndexOps.rb` to write data to an Excel file.
+  - **Description**: Processes index data, adds JSON information, and writes the updated data to an Excel file.
+
+  
+- #### `fillImageNotes`
+  - **Dependencies**: 
+    - Calls `readIndexData` from `bIndexOps.rb` to read data from an index file.
+    - Calls `writeImageNotes` from `bIndexOps.rb` to generate image notes based on input data.
+    - Calls `generateUniqueFilename` from `autoMethods.rb` to create a unique filename.
+    - Calls `writeXLSfromRowArray` from `bIndexOps.rb` to write data to an Excel file.
+  - **Description**: Processes index data to add image notes and writes the updated data to an Excel file.
+
+## File: `bIndexOps.rb`
+
+- **Description** Contains operations to be used on the Baly Index. An input file for these functions must be an Excel 97-2003 Worksheet (.xls) and must include the header row of the Baly Slide Index Google Sheet. Then the full rows of the Index to be processed can be pasted below. 
+### Gems
+- `'json'`
+
+### Constants
+- **DefaultFields** An array containing unique identifiers of each of the header rows in the Baly Slide Index Google Sheet. It need only include the ones used by functions in this file, but we must ensure that these strings are not found in any other header cells.
+
+- **MetaFields** A nested hash showing the desired structure of generated JSON data. The bottom level contains a hash showing the header row identifiers from DefaultFields where specific data can be found.
+
+- **SampleRowHash** A sample of the hashes produced for each row of the input spreadsheet. These are typically created by the readIndexData function, but a sample allows us to test methods reliably.
+
+- **RequiredJSON** A hash containing all the JSON data from digital kenyon that cannot be 
+
+### Class Extensions
+- #### Polymorphic
+    The following methods are defined for multiple classes, allowing them to be used at all levels of nested Arrays and Hashes containing strings.
+  - #### `fillable?` 
+    Method for Hashes, Arrays, and Strings. Tests whether the object is the last level of nesting, ie. when it contains only strings. For strings it always returns false.
+  - #### `addUnlessEmpty`
+    Method for Arrays and Hashes to add a value/key-value to the object provided that the value has length greater than 0.
+- #### Hash
+  - #### `addUnlessEmpty` 
+    Inserts a key-value pair into the hash unless the value passed has length equal to zero.
+
+  - #### `fillable?` 
+    Returns a boolean of whether both the keys and values of the hash are fillable using the `Array#fillable?` command defined below.
+- #### Array
+  - #### `fillable?` 
+    Tests whether the array is entirely composed of strings (ie. there are no nested objects inside)
+  - #### `addUnlessEmpty`
+    Pushes an element to the array if the elements length is greater than 0.
+  - #### `cleanDash` 
+    Removes a `'-'` element from the start of the array. Used to empty arrays that come from dashed cells in the Baly Slide Index Google Sheet.
+  - #### `cleanWhitespace` 
+    Uses the `String#fullstrip` method defined in `balyClasses.rb` to clean leading and trailing whitespace from each element of the array. Includes an option to remove elements that are empty after whitespace removal (default removes them).
+- #### String
+  - #### `fillable?`
+    Always returns false. It is defined for the String class to keep polymorphism when iterating through nested objects.
+  - #### `hyperlink?`
+    Tests whether the string matches the format for a viable hyperlink.
+
+### Functions
+- #### `formatReferences`
+  - **Dependencies**
+    - Calls `readIndexData` to read the "References" column of the input spreadsheet.
+    - Calls `hyperlink?` string method on each word of the reference to identify links.
+    - Calls `generateUniqueFilename` from `prettyCommonFunctions.rb` to make the output file name.
+    - Calls `writeXLSfromRowArray`[jump to](#writexlsfromrowarray) to create a new spreadsheet with the generated data
+  - **Description**
+  Reads an input spreadsheet and formats the references into html. This includes placing each reference in a <p> element and formatting links appropriately.
+
+- #### `writeJSON`
+  - **Dependencies**
+    - Calls `generateReqHash` ([link](#generatereqhash)) and `generateOptHash` ([link](#generateopthash)) to make a nested data object made of arrays, hashes, and strings.
+    - Calls `'json'` gem to transform this nested object into JSON
+  - **Description**
+  Writes JSON for a single row of the spreadsheet. Uses a rowhash object produced by `readIndexData`.
+- #### `generateOptHash`
+  - **Dependencies**
+    - Calls `fillable?` ([link](#fillable)) at each level of the MetaFields hash to find the last level.
+    - Calls `fillFromRow` ([link](#fillfromrow)) to complete last-level hashes using the rowhash.
+    - Calls `addUnlessEmpty` ([link](#addunlessempty)) to add the filled row into the nested structure.
+  - **Description**
+    Iterates through the MetaFields hash to fill it with data from the rowhash object produced by `readIndexData`. Returns a nested object that matches the structure of MetaFields.
+- #### `fillHashFromRow`
+  - **Dependencies**
+    - Calls `fullstrip?` method on strings from `balyClasses.rb` to detect dashed data inside the rowhash object
+  - **Description**
+    Uses conventions to read a bottom-level hash inside MetaFields and supply the necessary fixed and variable data. Variable data comes from the rowhash object produced by ReadIndexData
+- #### `fillArrayFromRow`
+    Mirrors the `fillHashFromRow` function to fill an end level array in the MetaFields hash.
+- #### `generateReqHash`
+  - **Dependencies**
+    - Calls `parseWrittenDates` ([link](#parsewrittendates))to format a string date into an array of day, month, and year.
+    - Calls `parsePrintedDates` ([link](#parseprinteddates)) to format a stamped date into an array containing the month and year.
+    - Calls `addUnlessEmpty` ([link](#addunlessempty)) to assemble data into a larger structure. 
+    - Calls the `cleanWhitespace` ([link](#cleanwhitespace)) array method to remove extra whitespace from arrays derived from rowhash items.
+    - Calls the `cleanDash` ([link](#cleandash)) array method to remove dashes marking missing data from the arrays derived from rowhash objects.
+    - Calls `parseSlideRange` ([link](#parsesliderange)) from `prettyCommonFunctions.rb` to properly format a comma separated list of old IDs
+    - Calls `is_integer?` and `fullstrip` string methods from `balyClasses.rb` to process strings from the rowhash object.
+  - **Description**
+    Generates a nested hash containing data that cannot be pulled straight from the rowhash object (dates, links, keywords, etc.).
+- #### `parseNestedEndpoints`
+  - **Description** 
+  This standalone function reads the nested hash MetaFields and locates the items that need to be collected by the readIndexData function. It returns a custom error function (passed as a parameter) when it detects that the given nested hash is improper. This raises an error early before other functions like `generateReqHash` process it.
+- #### `assembleKeywords
+  - **Dependencies**
+    - Calls `readIndexData`([link](#readindexdata)) to pull data from an input spreadsheet.
+    - Calls the `fullstrip`([link](#fullstrip)) string method to clean each keyword item
+  - **Description**
+    This currently unused function compiles a list/hash of the keywords passed, depending on the `includeOrigins` boolean parameter. If `includeOrigins = true`, it returns a hash pointing each keyword to the ids containing it, if not, it returns a simple array of keywords.
+- #### readIndexData
+  - **Dependencies**
+    - Calls `'spreadsheet'` gem to open and read the input spreadsheet.
+    - Calls `getFieldLocs` ([link](#getfieldlocs)) to know which spreadsheet columns contain which data
+  - **Description**
+    Simplifies the process of reading input spreadsheets by taking an input file, worksheet number and a string array of the column header identifiers (aka, fields) and outputting an array of rows, where each row is either a hash connecting the fields to the data, or an array just containing the data in the same order as the fields were passed.
+- #### getFieldLocs
+  - **Dependencies**
+    - Calls the `includesAtIndex` ([link](#includesatindex)) array method from `balyClasses.rb` to identify locations of each field in the header row.
+    - Calls the `includesCaseAtIndex` ([link](#includescaseatindex)) method for case-sensitive compatibility.
+  - **Description**
+    Takes the header row of an input spreadsheet and an array of field identifiers to look for and produces a hash connecting each field to the column that contains that data.
+- #### getLocationAttributes
+  - **Dependencies**
+    - Calls the `geocoder` gem to automatically get city, region, and country info from geocoordinates.
+  - **Description**
+    This function automatically generates geographic data from geocoordinates. However, the geocoder gem has been plagued with errors and has not worked for a while. As such it has been removed from other functions. Note that even when working properly, the data it produces still needs to be checked, and regions probably will not correspond to the custom regions we have defined for the project.
+- #### writeImageNotes
+  - **Dependencies**
+    - Calls `parseWrittenDates` and `parsePrintedDates` to format date information into arrays.
+    - Calls the `Classification` class from `balyClasses.rb` for formatting the old ids.
+    - Calls the `fullstrip` string method from `balyClasses.rb` to clean string data.
+  - **Description**
+    This function takes slide data and combines them into a formulaic paragraph, the slide's Image Notes field.
+- #### parseWrittenDates
+  - **Dependencies**
+    - Calls the string methods `fullstrip` ([link](#fullstrip)), `is_integer?` ([link](#isinteger)), and `is_float?` from `balyClasses.rb` to separate plain year dates from month-year or day-month-year.
+  - **Description**
+    Parses formulaic written dates into presentable strings or arrays that make data easier to read. The formula necessary is: "January 1, 1970, January 1970, 1970" to accomodate various levels of precision. For an input of "January 1, 1970" it can return either a string: "January 1st, 1970", an array: [1,"January",1970].
+- #### parsePrintedDates
+  - **Dependencies**
+    - Calls the `fullstrip` ([link](#fullstrip)) string method from `balyClasses.rb`
+  - **Description**
+    Reads a stamped date of the format that appears on the physical slides and formats it into a presentable date string or array of date info. The stamp dates have three letter month shorthands (JAN, JUL, etc) and two digit years. 
+- #### writeXLSfromRowArray
+  - **Dependencies**
+    - Calls the `'spreadsheet'` gem to open a blank spreadsheet
+    - Calls `generateUniqueFilename` from `prettyCommonFunctions.rb` to generate a filename based of the given title of the new spreadsheet.
+  - **Description**
+    This function simplifies the process of writing new spreadsheets by acting as a sort of inverse to `readIndexData`. It takes an array of row arrays and writes them into a new spreadsheet, with options to supply custom headers.

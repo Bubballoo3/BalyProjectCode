@@ -60,9 +60,11 @@ class String
     def is_integer?
         self.to_i.to_s == self
     end
-    def to_s
-        return self
+
+    def is_float?
+        self.to_f.to_s == self
     end
+    
     def lfullstrip
         temp=self
         if temp.length > 0

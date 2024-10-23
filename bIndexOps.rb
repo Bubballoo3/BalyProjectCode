@@ -16,17 +16,33 @@ class Slide
 end
 
 class Hash 
+  #Inserts a key-value pair into the hash unless the value passed has length equal to zero.
   def addUnlessEmpty(key,value,removeEmpty=true)
     if value.length > 0 or removeEmpty == false
       self[key]=value
     end
   end
+  # Returns a boolean of whether both the keys and values of the hash 
+  # are fillable using the `Array#fillable?` command defined below.
   def fillable?
     return (self.values.fillable? and self.keys.fillable?)
   end
 end
 
 class Array
+  # Boolean function that tests whether the array is entirely composed of strings 
+  # (ie. there are no nested objects inside)
+  def fillable?
+    onlystrings=true
+    if self.length > 0
+      self.each do |item|
+        if item.class != String
+          onlystrings=false
+        end
+      end
+    end
+    return onlystrings
+  end
   def addUnlessEmpty(value,removeEmpty=true)
     if value.length > 0 or removeEmpty == false
       self.push value
@@ -39,23 +55,14 @@ class Array
       end
     end
   end
-  def cleanWhitespace
+  def cleanWhitespace(removeBlanks=true)
     cleaned=Array.new
     self.each do |raw|
-      cleaned.addUnlessEmpty(raw.fullstrip,true)
-    end
-    return cleaned    
-  end
-  def fillable?
-    onlystrings=true
-    if self.length > 0
-      self.each do |item|
-        if item.class != String
-          onlystrings=false
-        end
+      if raw.class == String
+        cleaned.addUnlessEmpty(raw.fullstrip,removeBlanks)
       end
     end
-    return onlystrings
+    return cleaned    
   end
 end
 
@@ -336,6 +343,7 @@ def generateReqHash(rowHash,removeEmpty=false)
   revwords.each do |word|
     if word == genLocName.fullstrip
       keywords.delete word
+      break
     end
   end
 ##
@@ -369,7 +377,7 @@ def parseNestedEndpoints(nest, errormsg)
                 if value4.class == String and value4[0] != "="
                   fieldsarray.push value4
                 elsif value4[0] != "="
-                  raise overfillerror        
+                  raise errormsg       
                 end
               end
             end
@@ -471,122 +479,9 @@ def assembleKeywords(indexfile, worksheet=0, includeOrigins=true)
   end   
 end
 
-RequiredJSON={"context_key"=>"9847662",
-    "url"=>"http://digital.kenyon.edu/baly/744",
-    "peer_reviewed"=>false,
-    "parent_key"=>"5047491",
-    "parent_link"=>"http://digital.kenyon.edu/baly",
-    "site_key"=>"4580553",
-    "site_link"=>"http://digital.kenyon.edu",
-    "is_digital_commons"=>true,
-    "institution_title"=>"Kenyon College",
-    "fulltext_url"=>"https://digital.kenyon.edu/context/baly/article/1748/viewcontent",
-    "download_format"=>"picture",
-    "download_link"=>"https://digital.kenyon.edu/context/baly/article/1748/type/native/viewcontent",
-    "publication_key"=>"5047491",
-    "publication_title"=>"Denis Baly Image Collection",
-    "publication_link"=>"http://digital.kenyon.edu/baly",
-    "dc_or_paid_sw"=>true,
-    "include_in_network"=>false,
-    "embargo_date"=>"1970-01-01T00:00:01Z",
-    "mtime"=>"2024-07-23T21:05:17Z",
-    "exclude_from_oai"=>false,
-    "fields_digest"=>"4f75f61fc87b5b86e647ef93d9877f6ae476bcba",
-    "discipline_terminal_key"=>[510],
-    "document_type"=>["35mm_slide", "35 mm slide", "35 mm slides"],
-    "author"=>["Denis Baly"],
-    "ancestor_key"=>["9847662", "5047491", "4580553", "1"],
-    "virtual_ancestor_link"=>
-    ["http://digitalcommons.bepress.com",
-     "http://researchnow.bepress.com",
-     "http://digital.kenyon.edu",
-     "http://digital.kenyon.edu/depts",
-     "http://digital.kenyon.edu/arthistory",
-     "http://digital.kenyon.edu/baly",
-     "http://teachingcommons.us",
-     "http://teachingcommons.us/arts_humanities",
-     "http://ohio.researchcommons.org",
-     "http://liberalarts.researchcommons.org"],
-    "configured_field_t_rights_statements"=>["In Copyright - Non-Commercial Use Permitted", "http://rightsstatements.org/vocab/InC-NC/1.0/"],
-    "author_display_lname"=>["Baly"],
-    "discipline"=>["Arts and Humanities", "History of Art, Architecture, and Archaeology"],
-    "author_display"=>["Denis Baly"],
-    "configured_field_t_dpla_type"=>["Image", "Images", "image"],
-    "discipline_key_1"=>[510],
-    "discipline_key_0"=>[438],
-    "virtual_ancestor_key"=>["81989", "82034", "5025010", "7148337", "4580553", "7639796", "7561783", "5047491", "7127169", "5025132"],
-    "discipline_1"=>["History of Art, Architecture, and Archaeology"],
-    "discipline_0"=>["Arts and Humanities"],
-    "ancestor_link"=>["http://digital.kenyon.edu/baly/744", "http://digital.kenyon.edu/baly", "http://digital.kenyon.edu", "http:/"]
-}
-OptAPIfields={ #This hash is the order the info displays, not how it is delivered by the api.
-  "title"=>["Title"], ####### This is also a good reference for filling out batch spreadsheets
-  "publication_date"=>["Creation Year"],
-  "configured_field_t_documented_date" => ["Creation Date"],
-  "configured_field_t_sorting_number"=>["Sorting Number"],
-  "configured_field_t_identifier"=>["Image ID"],
-  "configured_field_t_alternate_identifier"=>["VRC slide number"],
-  "configured_field_t_subcollection"=>["Baly Subcollection"],
-  "configured_field_t_alt_subcollection"=>["VRC (Alternate) Subcollection"],
-  "configured_field_t_batch_stamp"=>["Batch Stamp"],
-  "abstract"=>["Abstract"],
-  "configured_field_t_description"=>["Description"],
-  "configured_field_t_references"=>["References"],
-  "configured_field_t_image_notes"=>["Image Notes"],
-  "configured_field_t_city"=>["City"],
-  "configured_field_t_region"=>["Region"],
-  "configured_field_t_country"=>["Country"],
-  "configured_field_t_coverage_spatial"=>["Geographic Reference"],
-  "configured_field_t_curator_notes"=>["Curator Notes"],
-  "configured_field_t_object_notation"=>["JSON"]
-}
-def generateAPIoutput(indexfile)
-  fields=parseNestedEndpoints(OptAPIfields,StandardError.new)
-  data=readIndexData(indexfile,0,fields,"Hash","casesensitive")
-  puts data
-  newdata=Array.new
-  data.each do |row|
-    optHash=generateOptHash(row,true,OptAPIfields)
-    puts "Custom Hash=#{optHash}"
-    finalHash=RequiredJSON.merge optHash
-    unless finalHash["title"] == ["Title"]
-      newdata.push(fixApiDiscrepancies(finalHash))
-    end
-  end
-  finaloutput=Hash.new
-  finaloutput["results"]=newdata
-  return finaloutput
-end
-def fixApiDiscrepancies(apiHash)
-  keystopullout=["title","abstract","publication_date"]
-  keystopullout.each do |key|
-    if apiHash[key].to_s.length > 0
-      #puts apiHash[key]
-      apiHash[key]=apiHash[key][0]
-      #puts apiHash[key]
-    end
-    #puts apiHash[key]
-  end
-  pubDate=apiHash["publication_date"]
-  if pubDate.fullstrip.is_integer?
-    newDate=pubDate+"-01-01T08:00:00Z"
-    apiHash["publication_date"]=newDate
-  end
-  return apiHash
-end
-def saveAPIsample(inputfile,outputfile= "none")
-  if outputfile== "none"
-    outputfile=generateUniqueFilename("json","sampleAPIdata")
-  end
-  apidata=generateAPIoutput(inputfile)
-  
-  IO.write(outputfile,apidata.to_json)
-  puts "Generated API data written to #{outputfile}"
-  return apidata[0]
-end
-
 def readIndexData(indexfile,worksheet=0,fields=DefaultFields,rowform= "Hash",mode= "none")
   require 'spreadsheet'
+  hashout=rowform.downcase == "hash"
   Spreadsheet.client_encoding = 'UTF-8'
   book = Spreadsheet.open indexfile
   sheet=book.worksheet worksheet
@@ -600,13 +495,13 @@ def readIndexData(indexfile,worksheet=0,fields=DefaultFields,rowform= "Hash",mod
       if data.class == NilClass
         data= ""
       end
-      if rowform.downcase == "hash"
+      if hashout
         rowdataHash[key]=data.to_s
       else
         rowdataList.push data.to_s
       end
     end
-    unless rowdataList.length > 0
+    if hashout
       sheetData.push rowdataHash
     else
       sheetData.push rowdataList
@@ -724,7 +619,7 @@ Months=["January","February","March","April","May","June","July","August","Septe
 #This function parses the "Written Dates" section of the index, converting an abbreviated or partial date to an acceptable string.
 def parseWrittenDates(stringin, mode= "String")
   #we check if the date is just the year, if it is we return it.
-  if stringin.to_i.to_s == stringin or stringin.to_f.to_s == stringin
+  if stringin.is_integer? or stringin.to_f.to_s == stringin
     stringin=stringin.to_f.round.to_s
     if stringin.fullstrip.is_integer?
       if mode == "String"
