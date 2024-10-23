@@ -366,7 +366,7 @@ def stripData(desc)
     sentences=desc[firstspace..].split ". "
     angledata=sentences[0]
     if sentences.length > 1
-      notes=''
+      notes= ''
       sentences[1..].each do |sentence|
         notes += sentence
       end
@@ -393,7 +393,7 @@ def formatSlideData(slide)
     locationName= generalLoc.name
     genCoords = formatCoords(generalLoc.coords)
   else
-    locationName=""
+    locationName= ""
     genCoords = ["",""]
   end
   specificLoc=slide.specificLocation
@@ -403,12 +403,12 @@ def formatSlideData(slide)
     specAngle=specificLoc.angle.to_s
     precision=specificLoc.precision
   else
-    title=""
+    title= ""
     specCoords=["",""]
-    specAngle=""
+    specAngle= ""
   end
   resultarray=[sortingNumber,title,balyid,vrcid,locationName,genCoords,specCoords,specAngle,precision]
-  notes=""
+  notes= ""
   [generalLoc,specificLoc].each do |loc|
     if loc.class < Location
       eachnote=loc.notes
@@ -421,7 +421,7 @@ def formatSlideData(slide)
   resultarray+=slide.getGeodata
   resultarray.each do |element|
     if element == 0
-      element=""
+      element= ""
     end
   end
   return resultarray
@@ -453,7 +453,7 @@ def writeToXls(bigarray, mode="straight", filename="blank")
   mainsheet.name = collectionTitle
 
   #we define a disclaimer to populate the top left cell, identifying that it was produced by code
-  disclaimer="This is an automatically generated spreadsheet titled \'" + collectionTitle + ".\' Please review the information before copying into permanent data storage."
+  disclaimer= "This is an automatically generated spreadsheet titled \'" + collectionTitle + ".\' Please review the information before copying into permanent data storage."
   mainsheet[0,0] = disclaimer
   
   if mode=="straight"

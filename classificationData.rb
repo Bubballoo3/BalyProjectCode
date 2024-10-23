@@ -381,3 +381,23 @@ B48to49hash={
 'B49.182-281' => 'CS.001-100',
 'B49.282-381' => 'CT.001-100',
 }
+
+=begin #testing
+
+load 'prettyCommonFunctions.rb'
+rtnarr=Array.new
+B48to49hash.values.each do |i|
+    primus=i.split(".")[0]
+    if primus.length < 3
+        puts primus
+        frst=generateSortingNumbers [primus+'.001']
+    end
+    unless rtnarr.include? frst
+        rtnarr.push frst
+    end
+end 
+rtnarr.each do |el|
+    print(el.to_s+',')
+end
+
+=end

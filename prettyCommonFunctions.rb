@@ -23,6 +23,9 @@ def parseSlideRange(string)
     if string.include? ". "
         n=string.index ". "
         string=string[...n]
+      elsif string.include? ". "
+        n=string.index ". "
+        string=string[...n]
     elsif string[-1]=="."
         string=string[...-1]
     end
@@ -46,7 +49,7 @@ def parseSlideRange(string)
         rightside=range.split(".")[1]
       else
         #in case it is only 222-22 
-        decimalpoint=0
+        # decimalpoint=0
         rightside=range
       end
       
@@ -135,96 +138,96 @@ end
 #the next functions, parseSlideRangeAttempt, prepareRanges, getsubcollection,findendplace, 
 # and regularizeRightSide are part of this attempt, currently unsuccessful.
 # The smaller functions may have other uses, but still need to be rigorously tested
-def parseSlideRangeAttempt(string)
-  #this will be our array that we return at the end
-  slidesMentioned=Array.new
-  collectionsToIndex=Hash.new
+# def parseSlideRangeAttempt(string)
+#   #this will be our array that we return at the end
+#   slidesMentioned=Array.new
+#   collectionsToIndex=Hash.new
 
-  #we begin by splitting the ranges. 
-  #Ranges are separated by commas, and common info is not repeated
-  #an especially complicated example of this is 
-  #"B27.012-15, B45.905-06, B47.654-63, 716-18"
-  ranges=prepareRanges(string)
-  #next we store each B-collection in case the next one reuses it
-  lastcollection= "ERROR"
-  thousandslide= "NONE"
-  #we now loop through the ranges and process them
-  ranges.each do |range|
+#   #we begin by splitting the ranges. 
+#   #Ranges are separated by commas, and common info is not repeated
+#   #an especially complicated example of this is 
+#   #"B27.012-15, B45.905-06, B47.654-63, 716-18"
+#   ranges=prepareRanges(string)
+#   #next we store each B-collection in case the next one reuses it
+#   lastcollection= "ERROR"
+#   thousandslide= "NONE"
+#   #we now loop through the ranges and process them
+#   ranges.each do |range|
     
-    #the following will be a sample range to indicate which parts the code is handling
+#     #the following will be a sample range to indicate which parts the code is handling
     
-    #B22.222-22  
-    #   ^
-    if range.include? "."
-      (leftside,rightside)=range.split(".")
-    else
-      #in case it is only 222-22 
-      rightside=range
-      leftside= "NONE"
-    end
+#     #B22.222-22  
+#     #   ^
+#     if range.include? "."
+#       (leftside,rightside)=range.split(".")
+#     else
+#       #in case it is only 222-22 
+#       rightside=range
+#       leftside= "NONE"
+#     end
     
-    #B22.222-22
-    #^^^
+#     #B22.222-22
+#     #^^^
     
-    #B22.222-22
-    #       ^
-    unless leftside== "NONE"
-      lastcollection = getSubcollection(leftside,rightside)
-    end
+#     #B22.222-22
+#     #       ^
+#     unless leftside== "NONE"
+#       lastcollection = getSubcollection(leftside,rightside)
+#     end
 
-    if rightside.include? "-"
-      rightside=regularizeRightside(rightside)
-      dashplace=4
-      (start,last)=rightside.split "-"
-      (start,last)=[start.to_i,last.to_i]
-      #difference=(last/100)-start/100
-      if last == 1000
-        last=999
-        thousandslide = lastcollection.to_s.split(".")[0]+"."+"1000"
-      end
-      #print start,last
-      #puts [rightside,hundreds,start,last] 
-      for i in start..last
-        length=i.to_s.length
-        if length < 3
-          if length < 2
-            ending=lastcollection.hundreds()+"0"+i.to_s
-          else
-            puts lastcollection.hundreds
-            ending=lastcollection.hundreds()+i.to_s 
-          end
-        else
-          ending=i.to_s
-        end
-        prefix=lastcollection.group
-        slide=prefix+"."+ending
-        slidesMentioned.push slide
-        collectionsToIndex[prefix]=slide
-      end
-      if thousandslide != "NONE"
-        slidesMentioned.push thousandslide
-      end
-    else
-      length=rightside.length
-      if length==3
-        slide=lastcollection.group+"."+rightside
-      elsif length == 2
-        slide=lastcollection.to_s+rightside
-      elsif length == 1
-        if slidesMentioned.length > 0
-          slide=slidesMentioned[-1][0...-1]+rightside
-        else
-          slide=lastcollection.to_s+"0"+rightside
-        end
-      end
-      slidesMentioned.push slide
-    end
-  end
-  minslide=slidesMentioned[0]
-  maxslide=slidesMentioned[-1]  
-  return [slidesMentioned,minslide,maxslide]
-  #we begin by splitting our description up by subcollection.
-end
+#     if rightside.include? "-"
+#       rightside=regularizeRightside(rightside)
+#       dashplace=4
+#       (start,last)=rightside.split "-"
+#       (start,last)=[start.to_i,last.to_i]
+#       #difference=(last/100)-start/100
+#       if last == 1000
+#         last=999
+#         thousandslide = lastcollection.to_s.split(".")[0]+"."+"1000"
+#       end
+#       #print start,last
+#       #puts [rightside,hundreds,start,last] 
+#       for i in start..last
+#         length=i.to_s.length
+#         if length < 3
+#           if length < 2
+#             ending=lastcollection.hundreds()+"0"+i.to_s
+#           else
+#             puts lastcollection.hundreds
+#             ending=lastcollection.hundreds()+i.to_s 
+#           end
+#         else
+#           ending=i.to_s
+#         end
+#         prefix=lastcollection.group
+#         slide=prefix+"."+ending
+#         slidesMentioned.push slide
+#         collectionsToIndex[prefix]=slide
+#       end
+#       if thousandslide != "NONE"
+#         slidesMentioned.push thousandslide
+#       end
+#     else
+#       length=rightside.length
+#       if length==3
+#         slide=lastcollection.group+"."+rightside
+#       elsif length == 2
+#         slide=lastcollection.to_s+rightside
+#       elsif length == 1
+#         if slidesMentioned.length > 0
+#           slide=slidesMentioned[-1][0...-1]+rightside
+#         else
+#           slide=lastcollection.to_s+"0"+rightside
+#         end
+#       end
+#       slidesMentioned.push slide
+#     end
+#   end
+#   minslide=slidesMentioned[0]
+#   maxslide=slidesMentioned[-1]  
+#   return [slidesMentioned,minslide,maxslide]
+#   #we begin by splitting our description up by subcollection.
+# end
 
 def prepareRanges(string)
   if string.include? ". "
@@ -302,8 +305,10 @@ def getCatType(catnum)
     hypothesis= "Baly"
   elsif catnum[1] == "."
     hypothesis= "Baly"
-  elsif [0,1,2,3,4,5,6,7,8,9].include? catnum.split('.')[1][-1]
+  elsif catnum.split('.')[0][-1].is_integer?
     hypothesis= "VRC"
+  else
+    hypothesis= "Baly"
   end
   (prefix,suffix)=catnum.split(".")
   
@@ -313,45 +318,42 @@ def getCatType(catnum)
       # If errors are occurring in the higher numbers, look here. 
       if suffix.to_i <= BalyMaxNum
         return "Baly"
-      else         
+      else                 
+        puts "Subcollection #{prefix} doesn't include that number (#{suffix}) \n"
         return "N/A" 
-        print "Subcollection #{prefix} doesn't include that number (#{suffix})"
-        puts
       end
-    else 
-      return "N/A" 
-      print "This alphanumeric (#{prefix})was not used by Baly"
-      puts
+    else
+      puts "This alphanumeric (#{prefix}) was not used by Baly"
+      return "N/A"
     end
   end
 
   if hypothesis == "VRC"
     if prefix[1..].to_i < 42
-      #The 117 below is nothing more than the largest number we have indexed in a collection thus far
-      # If errors are occurring in the higher numbers, look here. 
-      if suffix.to_i < 118 
+      if suffix.to_i < BalyMaxNum 
         return "VRC"
       else
-        return "N/A" 
         print "Subcollection #{prefix} doesn't include that number (#{suffix})"
         puts
+        return "N/A" 
       end
     elsif prefix [1..].to_i < 51
       if suffix.to_i < 1001
         return "VRC"
       else
-        return "N/A" 
         print "Subcollection #{prefix} doesn't include that number (#{suffix})"
         puts
+        return "N/A"
       end
     else
-      return "N/A" 
       print "This alphanumeric (#{prefix})was not used by Baly"
       puts
+      return "N/A"
     end
   end
-  return "N/A"
   puts "If its made it this far the slide cannot be sorted"
+  return "N/A"
+
 end
 =begin #testing code
 testslide= "B12.045"
@@ -365,7 +367,7 @@ def generateUniqueFilename(filetype= "xls",someTitle)
   time=Time.now
   minutes=time.min
   seconds=time.sec
-  filename=someTitle+minutes.to_s + "." + seconds.to_s+"."+filetype
+  filename=title+minutes.to_s + "." + seconds.to_s+"."+filetype
   return filename
 end
 

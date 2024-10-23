@@ -320,3 +320,60 @@ def indexConverter(slide,outputform= 'String')
     end
     return newslide
 end
+
+=begin #testing code
+testslide= "B12.045"
+while testslide != "n"
+    testslide=gets[0...-1]
+    unless testslide == 'n'
+        puts indexConverter(testslide)
+    end
+end
+=end
+#test results:
+#   Successfully converted B47.001-999 and B42.001-999
+#   
+def generateSortingNumbers(array,altIDs=false)
+    if array.class == String
+      array=Array(array)
+    end
+    sortingNumbers=Array.new
+    balyIDs=Array.new
+    vrcIDs=Array.new
+    array.each do |cat|
+      if cat.class == NilClass
+        sortingNumbers.append ""
+      elsif cat.length < 2
+        sortingNumbers.append ""
+      elsif Threeletterclassifications.include? cat
+        sortingNumbers.append ""
+      elsif altIDs
+        slide=Slide.new(cat)
+        altid=indexConverter(slide.getindex)
+        if altid.class == Classification
+          slide.addAltID(altid)
+        end
+        vrcIDs.push slide.getindex("VRC").to_s
+        balyid=slide.getindex "Baly"
+        balyIDs.push balyid.to_s
+        sortingNumbers.push balyid.sortingNumber
+      else
+        classification=Classification.new(cat)
+        if classification.classSystem == "VRC"
+          altId=indexConverter(classification)
+          if altId.class == Classification
+            sortingNumbers.append altId.sortingNumber
+          else
+            sortingNumbers.append 0
+          end
+        else
+          sortingNumbers.append classification.sortingNumber
+        end
+      end
+    end
+    if altIDs
+      return [sortingNumbers,balyIDs,vrcIDs]
+    else
+      return sortingNumbers
+    end
+  end
