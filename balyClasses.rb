@@ -66,7 +66,7 @@ class String
     end
     
     def lfullstrip
-        temp=self
+        temp=self.cleanSpaces
         if temp.length > 0
             while temp[0].codepoints[0]==32 or temp[0].codepoints[0]==160
                 temp=temp[1..-1]
@@ -78,7 +78,7 @@ class String
         return temp
     end
     def rfullstrip
-        temp=self
+        temp=self.cleanSpaces
         if temp.length > 0
             while temp[-1].codepoints[0]==32 or temp[-1].codepoints[0]==160
                 temp=temp[...-1]
