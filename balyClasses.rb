@@ -308,7 +308,7 @@ class Classification
             @input=classnumber
             (@group,@number) = classnumber
         else #if the input is not readable, we print a warning, and raise an error
-            raise ClassificationError.new "#{classnumber} is not a valid Classification object"
+            raise ClassificationError.new "'#{classnumber}' is not a valid Classification object"
         end
         stringnum=@number.to_s
         while stringnum.length < 3
