@@ -188,10 +188,10 @@ class Slide
     end
     #For this accessor, we accept the choice of which indexing is returned.
     #if a choice is not made, we default to the non-zero one or Baly ID 
-    def getindex(system=0)
-        if system== "Baly"
+    def getindex(system="none")
+        if system == "Baly"
             return @Balyid
-        elsif system== "VRC"
+        elsif system == "VRC"
             return @VRCid
         else
             [@Balyid,@VRCid].each do |id|
@@ -406,7 +406,6 @@ class Location
     end
     #other methods
     def parseLocationArray(input)
-        print input
         tuple=input[0]
         data=input[1]
         arrlength=input.length
@@ -473,7 +472,7 @@ class SpecificLocation < Location
         stringin=stringin.downcase
         if stringin.include?(" at ")
             (precisiondata,angledata)=stringin.split(" at ")
-            print precisiondata,angledata
+            #print precisiondata,angledata
         elsif stringin.include?(" facing ")
             (precisiondata,angledata)=stringin.split(" facing ")
         else
