@@ -5,6 +5,9 @@
 # We start by creating a special error class for this file
 # 
 # For each function, we start with a expect function that will allow us to easily test the method with feedback
+# 
+
+
 class TestingError<StandardError
 end
 class FileTester
@@ -12,6 +15,199 @@ class FileTester
     puts "No testAll function has been defined"
   end
 end
+
+#balyClasses.rb
+load 'balyClasses.rb'
+class BalyClassesTester < FileTester
+  def testAll()
+    testClassExtensions
+    testClassificationClass
+    testSlideClass
+    return true
+  end
+
+  def testClassExtensions()
+    # These methods should always work, 
+    # so we define a universal error for all of them
+    serr=TestingError.new "A string class method test has failed"
+    # Test the is_integer? method
+    raise serr unless "1".is_integer?
+    raise serr unless "89".is_integer?
+    raise serr unless "-152".is_integer?
+    raise serr if "123.45".is_integer?
+    raise serr if "hi".is_integer?
+    
+    # Test the is_float? method
+    raise serr unless "1.23".is_float?
+    raise serr unless "89.123".is_float?
+    raise serr unless "-152.456".is_float?
+    raise serr if "123".is_float?
+    raise serr if "omega".is_float?
+
+    # Test the lfullstrip method
+    raise serr unless "   hi".lfullstrip == "hi"
+
+    # Test the rfullstrip method
+    raise serr unless "hi   ".rfullstrip == "hi"
+
+    # Test the fullstrip method
+    raise serr unless "   hi   ".fullstrip == "hi"
+
+    # Test the alphValue method
+    raise serr unless "A".alphValue == 1
+    raise serr unless "BA".alphValue == 53
+    raise serr unless "DD".alphValue == 108
+    raise serr unless "ABC".alphValue == 731
+
+    # Test the cleanSpaces method
+    raise serr unless "   hi   ".cleanSpaces == "   hi   "
+    raise serr unless " hi   ".cleanSpaces == " hi   "
+          
+    aerr=TestingError.new "An array method test has failed"
+    # Test the includesAtIndex method
+      # Test basic functionality
+    raise aerr unless ["1","2","3","4","5"].includesAtIndex("2") == [1]
+    raise aerr unless ["1","2","3","4","5"].includesAtIndex("4") == [3]
+    raise aerr unless ["1","2","3","4","5"].includesAtIndex("6") == []
+    raise aerr unless ["1","2","3","1","1"].includesAtIndex("1") == [0,3,4]
+      # Test case insensitivity
+    raise aerr unless ["M","N","O","P","Q"].includesAtIndex("p") == [3]
+    raise aerr unless ["M","N","O","P","Q"].includesAtIndex("q") == [4]
+      # Test partial finds
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesAtIndex("d") == [2,3]
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesAtIndex("He") == [0,3]
+    
+    # Test the includesCaseAtIndex method
+    raise aerr unless ["M","N","O","P","Q"].includesCaseAtIndex("p") == []
+    raise aerr unless ["M","N","O","P","Q"].includesCaseAtIndex("P") == [3]
+      # Test partial finds
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesCaseAtIndex("D") == [2,3]
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesCaseAtIndex("he") == [0,3]
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesCaseAtIndex("d") == [3]
+    raise aerr unless ["The","Lazy","DOG sat alone","Didn't he"].includesCaseAtIndex("t") == [2,3]
+    
+    herr=TestingError.new "A hash method test has failed"
+    # Test invertible? method
+    raise herr unless {"A"=>1,"B"=>2,"C"=>3}.invertible?
+    raise herr unless {"A"=>1,"B"=>2,"C"=>2}.invertible? == false
+  end
+  
+  def classificationExpect(value,expectation)
+    err=TestingError.new "A classification method test has failed. Expected #{expectation} but got #{value}."
+    raise err unless value == expectation
+  end
+
+  def testClassificationClass()
+    # Test initialization
+      # Standard syntax
+    c=Classification.new("B.005")
+    classificationExpect(c.to_s,"B.005")
+    d=Classification.new("CD.055")
+    classificationExpect(d.to_s,"CD.055")
+      # Nonstandard syntax
+    e=Classification.new("B34.3")
+    classificationExpect(e.to_s,"B34.003")
+    f=Classification.new("F. 42")
+    classificationExpect(f.to_s,"F.042")
+  end
+  def slideExpect(value,expectation)
+    err=TestingError.new "A slide method expected #{expectation} but got #{value}"
+    raise err unless value == expectation
+  end
+  def testSlideClass()
+  # we start with basic methods and get more complicated
+    # Simple Case testing getindex and groups
+    bSlide=Slide.new("A.001")
+    slideExpect(bSlide.balyGroup,"A")
+    slideExpect(bSlide.getindex.to_s,"A.001")
+    slideExpect(bSlide.getindex("Baly").to_s, "A.001")
+    slideExpect(bSlide.getindex("VRC"),0)
+    vSlide=Slide.new("B43.1000")
+    slideExpect(vSlide.VRCGroup,"B43")
+    slideExpect(vSlide.getindex.to_s,"B43.1000")
+    slideExpect(vSlide.getindex("Baly"),0)
+    slideExpect(vSlide.getindex("VRC").to_s, "B43.1000")
+    # Test the addAltID method
+      # String in
+    bSlide.addAltID("B01.001")
+    vSlide.addAltID("CD.21")
+    # Confirm results
+    slideExpect(bSlide.getindex.to_s,"A.001") # getIndex should always return the Baly id
+    slideExpect(vSlide.getindex.to_s,"CD.021")
+    slideExpect(bSlide.getindex("VRC").to_s, "B01.001")
+    slideExpect(vSlide.getindex("Baly").to_s, "CD.021")
+      # Classification in
+    bclass=Classification.new("B.005")
+    vclass=Classification.new("B42.421")
+    # Refresh examples
+    bSlide=Slide.new("H.100")
+    vSlide=Slide.new("B21.052")
+    # Add ids
+    bSlide.addAltID(vclass)
+    vSlide.addAltID(bclass)
+    # Confirm results
+    slideExpect(bSlide.getindex.to_s,"H.100") # getIndex should always return the Baly id
+    slideExpect(vSlide.getindex.to_s,"B.005")
+    slideExpect(bSlide.getindex("VRC").to_s, "B42.421")
+    slideExpect(vSlide.getindex("VRC").to_s, "B21.052")
+    
+    # Test addTitle
+    bSlide.addTitle "This is a test title"
+    slideExpect(bSlide.title,"This is a test title")
+
+    # Test addLocation
+    # General Locations
+      # Smallest example 
+    sgenlocArray=[[0,0],"A place"]
+    bSlide.addLocation(sgenlocArray)
+      # get coordinates
+    slideExpect(bSlide.getCoordinates,[0,0])
+      # get full location
+    samplegenloc=GeneralLocation.new(sgenlocArray)
+    slideExpect(bSlide.generalLocation.name,samplegenloc.name)
+    slideExpect(bSlide.generalLocation.coords,samplegenloc.coords)
+    slideExpect(bSlide.generalLocation.notes,samplegenloc.notes)
+      # Larger example
+    mgenlocArray=[[10,20],"Place Name","Some notes"]
+      #replace location
+    bSlide.addLocation(mgenlocArray,false,true)
+    slideExpect(bSlide.getCoordinates,[10,20])
+      # get full location
+    mamplegenloc=GeneralLocation.new(mgenlocArray)
+    slideExpect(bSlide.generalLocation.name,mamplegenloc.name)
+    slideExpect(bSlide.generalLocation.coords,mamplegenloc.coords)
+    slideExpect(bSlide.generalLocation.notes,mamplegenloc.notes)
+
+    # Specific Locations
+      # Smallest example
+    sspeclocArray=[[1,1],"possible location at 35 degrees NE"]
+    bSlide.addLocation(sspeclocArray,true) # add specific location
+    slideExpect(bSlide.getCoordinates,[1,1])
+      # get full location
+    samplespecloc=SpecificLocation.new(sspeclocArray)
+    slideExpect(bSlide.specificLocation.title,samplespecloc.title)
+    slideExpect(bSlide.specificLocation.coords,samplespecloc.coords)
+    slideExpect(bSlide.specificLocation.notes,samplespecloc.notes)
+    slideExpect(bSlide.specificLocation.precision,samplespecloc.precision)
+    slideExpect(bSlide.specificLocation.angle.degrees,samplespecloc.angle.degrees)
+    slideExpect(bSlide.specificLocation.angle.direction,samplespecloc.angle.direction)
+    slideExpect(bSlide.specificLocation.angle.to_s,samplespecloc.angle.to_s)
+      # Larger example
+    mspeclocArray=[[2,2],"possible location at 0 degrees N","Some medium notes","Some medium title"]
+    bSlide.addLocation(mspeclocArray,true,true) # add specific location
+    slideExpect(bSlide.getCoordinates,[2,2])
+      # get full location
+    mamplespecloc=SpecificLocation.new(mspeclocArray)
+    slideExpect(bSlide.specificLocation.title,mamplespecloc.title)
+    slideExpect(bSlide.specificLocation.coords,mamplespecloc.coords)
+    slideExpect(bSlide.specificLocation.notes,mamplespecloc.notes)
+    slideExpect(bSlide.specificLocation.precision,mamplespecloc.precision)
+    slideExpect(bSlide.specificLocation.angle.degrees,mamplespecloc.angle.degrees)
+    slideExpect(bSlide.specificLocation.angle.direction,mamplespecloc.angle.direction)
+    slideExpect(bSlide.specificLocation.angle.to_s,mamplespecloc.angle.to_s)
+  end
+end
+
 
 
 
@@ -73,7 +269,9 @@ class PrettyCommonFunctionsTester < FileTester
   end
 end
 
-p=PrettyCommonFunctionsTester.new
-p.testAll
-
+classes=[BalyClassesTester.new,PrettyCommonFunctionsTester.new]
+classes.each do |tester|
+    puts "Testing #{tester.class}..."
+    tester.testAll
+end
 puts "Testing Successfull as all modules have passed"
