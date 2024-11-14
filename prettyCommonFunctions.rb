@@ -229,63 +229,65 @@ end
 #   #we begin by splitting our description up by subcollection.
 # end
 
-def prepareRanges(string)
-  if string.include? ". "
-    n=string.index ". "
-    string=string[...n]
-  end
-  ranges=string.split(",",-1)
-  for i in 0...ranges.length
-   ranges[i] = ranges[i].lfullstrip
-  end
-  return ranges
-end
-def getSubcollection(leftside,rightside)
-  dashplace=findendplace(rightside)
-  if dashplace < 3
-    lastcollection=Subcollection.new(leftside+"."+"0")
-  else
-    lastcollection=Subcollection.new(leftside+'.'+rightside[0])
-  end
-  return lastcollection 
-end
-def findendplace(rightside)
-  unless rightside.include? "-" 
-    count=0
-    endplace=rightside.length
-    rightside.each_char do |char|
-      if char.is_integer?
-        count+=1
-      else
-        endplace=count
-      end
-    end
-  else
-    endplace=rightside.index "-"
-  end
-  return endplace
-end
-def regularizeRightside(rightside)
-  endplace=findendplace(rightside)
-  while endplace < 3
-    puts endplace
-    rightside= "0"+rightside
-    endplace+=1
-  end
-  if rightside.include? "-"
-    lastpart=rightside.split("-")[1]
-    while lastpart[-1].is_integer? == false
-      lastpart=lastpart[0...-1]
-    end
-    count=0
-    while lastpart.length < 3
-      lastpart=rightside[count]+lastpart
-      count+=1
-      rightside=rightside[0..endplace]+lastpart
-    end
-  end
-  return rightside
-end
+## The next few functions contributed to the failed attempt, and have been commented out.
+#  They may be useful in the future though, so we leave them in the file.
+# def prepareRanges(string)
+#   if string.include? ". "
+#     n=string.index ". "
+#     string=string[...n]
+#   end
+#   ranges=string.split(",",-1)
+#   for i in 0...ranges.length
+#    ranges[i] = ranges[i].lfullstrip
+#   end
+#   return ranges
+# end
+# def getSubcollection(leftside,rightside)
+#   dashplace=findendplace(rightside)
+#   if dashplace < 3
+#     lastcollection=Subcollection.new(leftside+"."+"0")
+#   else
+#     lastcollection=Subcollection.new(leftside+'.'+rightside[0])
+#   end
+#   return lastcollection 
+# end
+# def findendplace(rightside)
+#   unless rightside.include? "-" 
+#     count=0
+#     endplace=rightside.length
+#     rightside.each_char do |char|
+#       if char.is_integer?
+#         count+=1
+#       else
+#         endplace=count
+#       end
+#     end
+#   else
+#     endplace=rightside.index "-"
+#   end
+#   return endplace
+# end
+# def regularizeRightside(rightside)
+#   endplace=findendplace(rightside)
+#   while endplace < 3
+#     puts endplace
+#     rightside= "0"+rightside
+#     endplace+=1
+#   end
+#   if rightside.include? "-"
+#     lastpart=rightside.split("-")[1]
+#     while lastpart[-1].is_integer? == false
+#       lastpart=lastpart[0...-1]
+#     end
+#     count=0
+#     while lastpart.length < 3
+#       lastpart=rightside[count]+lastpart
+#       count+=1
+#       rightside=rightside[0..endplace]+lastpart
+#     end
+#   end
+#   return rightside
+# end
 
 #The next function takes a slide categorization number and returns if it is an element of the 
 # VRC or Baly categorization system. It does not reference a database, but just uses the 
