@@ -309,7 +309,7 @@ def writeToXlsWithClass(bigarray, mode="straight", filename="blank",fillBlanks=t
   if filename != "blank"
     book.write filename
   else 
-    book.write generateUniqueFilename("xls",collectionTitle)
+    book.write generateUniqueFilename(collectionTitle,"xls")
   end
 end
 
@@ -589,7 +589,8 @@ def writeXLSfromColArray(newfile,data,headers=[])
   end
 
   if newfile[-3..] != "xls"
-    newfile=generateUniqueFilename("xls","NewSpreadsheet")
+    puts "The file #{newfile} did not meet the formatting criteria, and a generic title was provided"
+    newfile=generateUniqueFilename("NewSpreadsheet","xls")
   end
   book.write newfile
 end

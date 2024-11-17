@@ -364,7 +364,7 @@ while testslide != "n"
     puts getCatType(testslide)
 end
 =end
-def generateUniqueFilename(filetype= "xls",someTitle)
+def generateUniqueFilename(someTitle,filetype= "xls")
   title=cleanTitle(someTitle)
   time=Time.now
   minutes=time.min

@@ -113,7 +113,7 @@ class JsonSample
  public
   def saveAPIsample(inputfile,outputfile= "none")
     if outputfile== "none"
-      outputfile=generateUniqueFilename("json","sampleAPIdata")
+      outputfile=generateUniqueFilename("sampleAPIdata","json")
     end
     apidata=generateAPIoutput(inputfile)
     IO.write(outputfile,apidata.to_json)

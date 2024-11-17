@@ -60,7 +60,7 @@ def fillJSON(indexfile,removeEmpty=true,overwrite=true)
     newrow[-1]=json
     newdata.push newrow
   end
-  newfilename=generateUniqueFilename("xls","JSONAdded")
+  newfilename=generateUniqueFilename("JSONAdded","xls")
   writeXLSfromRowArray(newfilename,newdata[1..],finalfields)
 end
 
@@ -83,6 +83,6 @@ def fillImageNotes(indexfile,overwrite=false)
     newrow[-1]=imNotes
     newdata.push newrow
   end
-  newfilename=generateUniqueFilename("xls","ImageNotesAdded")
+  newfilename=generateUniqueFilename("ImageNotesAdded","xls")
   writeXLSfromRowArray(newfilename,newdata[1..],fields)
 end

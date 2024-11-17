@@ -116,7 +116,7 @@ def formatReferences(xlsfile='input.xls')
     htmlArray.push newrow
   end
 
-  newfilename=generateUniqueFilename("xls","HtmlReferenced")
+  newfilename=generateUniqueFilename("HtmlReferenced","xls")
   writeXLSfromRowArray(newfilename,htmlArray[1..],fields)
 end
 
@@ -721,7 +721,7 @@ def writeXLSfromRowArray(newfile,data,headers=[])
     currentrow+=1
   end
   if newfile[-3..] != "xls"
-    newfile=generateUniqueFilename("xls","NewSpreadsheet")
+    newfile=generateUniqueFilename("NewSpreadsheet","xls")
   end
   book.write newfile
 end
