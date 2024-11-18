@@ -12,14 +12,6 @@ require 'minitest/autorun'
 
 load 'autoMethods.rb'
 
-class TestingError<StandardError
-end
-class FileTester
-  def testAll()
-    puts "No testAll function has been defined"
-  end
-end
-
 ##########################################################################################
 ### balyClasses.rb
 
@@ -377,55 +369,86 @@ class BalyClassesTester < Minitest::Test
 end
 
 
-
+##########################################################################################
 # prettyCommonFunctions.rb
-load 'prettyCommonFunctions.rb'
+
 #   We start with the base functions and move to larger ones
-class PrettyCommonFunctionsTester < FileTester
-  # Summarize tests for each Function
-  def testAll()
-    testGetCatType
-    testParseSlideRange
-    testGenerateUniqueFilename
-    return true
-  end
-private
-# getCatType() 
-#   IN: a classification of a slide
-#   OUT: the system of this classification, either "VRC" or "Baly" or "N/A" (if not parseable)
-  def catTypeExpect(inp,exp)
-    type=getCatType(inp)
-    assertingError.new "getCatType failed to classify #{inp}. Instead returned #{type}." unless type == exp
-  end
-  def testGetCatType()
-    expectations={
-      #"B45.555" => "VRC",
-      "A.004" => "Baly",
-      "BA.042" => "Baly",
-      "BG.100" => "Baly",
-      "BG.200" => "N/A",
-      "BFSDFE" => "N/A"
-    }
-    expectations.each do |inp,outp|
-      catTypeExpect(inp,outp)
+class PrettyCommonFunctionsTester < Minitest::Test
+  # The rest of the files are function based, so we test each function individually,
+  # and give a short explanation of each one. Smaller functions are combined when possible.
+  
+  # getCatType() 
+  #   IN: a classification of a slide
+  #   OUT: the system of this classification, either "VRC" or "Baly" or "N/A" (if not parseable)
+  class GetCatTypeTester < PrettyCommonFunctionsTester
+    # This function currently isn't being used, and is replaced by the 
+    # classSystem method of Classifications, so it is only lightly tested.
+    def test_basic
+      assert_equal "VRC", getCatType("B45.555")
+      assert_equal "Baly", getCatType("A.004")
+      assert_equal "Baly", getCatType("BA.042")
+      assert_equal "Baly",  getCatType("BG.100")
+      assert_equal "N/A",  getCatType("BG.200")
+      assert_equal "N/A",  getCatType("BFSDFE")
     end
   end
 
-# getUniqueFilename()
-#   IN: A string filetype ending (default xls)
-
-# parseSlideRange()
-#   IN: a series of comma separated ranges similar to A.001-002.
-#   OUT: An array of individual classifications contained in the ranges, as well as the max and min of the range.
-
-  def slideRangeExpect(range,arr)
-    out=parseSlideRange(range)[0]
-    assertingError.new "parseSlideRange failed to parse #{range}. Instead returned #{out}." unless out==arr 
+  # generateUniqueFilename(title,extension)
+  #   IN: A string title and a string file extension (default xls)
+  #   OUT: a filename composed of the title, digits corresponding 
+  #        with the current time, and the appropriate extension 
+  class GenerateUniqueFilenameTester < PrettyCommonFunctionsTester
+    def test_basic
+      # Normal use
+      tfile1 = generateUniqueFilename("sampleAPIdata","xls")
+      assert_equal "sampleAPIdata", tfile1[0..12]
+      assert_equal "xls", tfile1[-3..-1]
+    end
+    def test_long_titles
+      tfile2 = generateUniqueFilename("loooooooooooooooooooooooooooooooooooooooooooooooooooooongname","pdf")
+      assert_equal "loooooooooooooooooooooooooooooooooooooooooooooooooooooongname", tfile2[0..60]
+      assert_equal "pdf", tfile2[-3..-1]
+    end
+    def test_defaults
+      # No extension provided
+      tfile3 = generateUniqueFilename("title")
+      assert_equal "title", tfile3[0..4]
+      assert_equal "xls", tfile3[-3..-1]
+    end
   end
+
+  # parseSlideRange()
+  #   IN: a series of comma separated ranges similar to A.001-002.
+  #   OUT: A nested array containing three elements:
+  #         1. Array of individual classifications contained in the ranges 
+  #         2. Max of range
+  #         3. Min of range
+  class ParseSlideRangeTester < PrettyCommonFunctionsTester
+    # This function, on the other hand, is an important dependency for bigger
+    # ones like indexConverter, and so is extensively tested.
+    def test_best_case
+      assert_equal [["F.005","F.006","F.007","F.008"],"F.005","F.008"] , parseSlideRange("F.005-F.008")
+    end
+    def test_normal_case
+      # These are the conventions used in the ClassificationData.rb ranges
+      assert_equal [["A.001","A.002","A.003","A.004","A.005"],"A.001","A.005"], parseSlideRange("A.001-005")
+    end
+    def test_multiple_ranges
+    end
+    def test_VRC_case
+    end
+    def test_long_range
+    end
+    def test_singleton
+    end
+    def test_all
+    end
+  end
+end
+
   def testParseSlideRange()
     expectations={
       #Simple Case
-      "A.001-05" => ["A.001","A.002","A.003","A.004","A.005"],
       #Multiple simple case
       "A.01,B.002-4,C.2" => ["A.001","B.002","B.003","B.004","C.002"],
       #VRC classification case
@@ -435,20 +458,6 @@ private
       slideRangeExpect(inp,res)
     end
   end
-  def testGenerateUniqueFilename
-    err=TestingError.new "The Generate Unique Filename function has produced an error. This is not a very complicated function, so something is fundamentally wrong. Check your ruby version."
-    # Normal use
-    tfile1 = generateUniqueFilename("sampleAPIdata","xls")
-    assertunless tfile1[0..12]=="sampleAPIdata" and tfile1[-3..-1]=="xls"
-    tfile2 = generateUniqueFilename("loooooooooooooooooooooooooooooooooooooooooooooooooooooongname","pdf")
-    assertunless tfile2[0..60]=="loooooooooooooooooooooooooooooooooooooooooooooooooooooongname" and tfile2[-3..-1]=="pdf"
-    # Edge Cases
-    # No extension
-    tfile3 = generateUniqueFilename("title")
-    assertunless tfile3[0..4]=="title" and tfile3[-3..-1]=="xls"
-    
-  end
-end
 
 # classes=[BalyClassesTester.new,PrettyCommonFunctionsTester.new]
 # classes.each do |tester|
