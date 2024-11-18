@@ -8,8 +8,14 @@ Threeletterclassifications=["EJB"]
 # 
 # ASIDE: This is the key to time efficient data entry. There are many parts of the collection which are
 #        consistent in some aspect with unpredictable and varying interruptions (eg. classification methodology).
-#         
-def parseSlideRange(string)
+
+# parseSlideRange()
+#   IN: a series of comma separated ranges similar to A.001-002.
+#   OUT: A nested array containing three elements:
+#         1. Array of individual classifications contained in the ranges 
+#         2. Max of range
+#         3. Min of range         
+def parseSlideRange(instring)
     #this will be our array that we return at the end
     slidesMentioned=Array.new
   
@@ -20,11 +26,9 @@ def parseSlideRange(string)
     #Ranges are separated by commas, and common info is not repeated
     #an especially complicated example of this is 
     #"B27.012-15, B45.905-06, B47.654-63, 716-18"
+    string=instring.fullstrip
     if string.include? ". "
         n=string.index ". "
-        string=string[...n]
-      elsif string.include? ". "
-        n=string.index ". "
         string=string[...n]
     elsif string[-1]=="."
         string=string[...-1]
@@ -142,7 +146,6 @@ end
 #   #this will be our array that we return at the end
 #   slidesMentioned=Array.new
 #   collectionsToIndex=Hash.new
-
 #   #we begin by splitting the ranges. 
 #   #Ranges are separated by commas, and common info is not repeated
 #   #an especially complicated example of this is 
@@ -153,9 +156,9 @@ end
 #   thousandslide= "NONE"
 #   #we now loop through the ranges and process them
 #   ranges.each do |range|
-    
+#    
 #     #the following will be a sample range to indicate which parts the code is handling
-    
+#    
 #     #B22.222-22  
 #     #   ^
 #     if range.include? "."
@@ -165,16 +168,16 @@ end
 #       rightside=range
 #       leftside= "NONE"
 #     end
-    
+#    
 #     #B22.222-22
 #     #^^^
-    
+#    
 #     #B22.222-22
 #     #       ^
 #     unless leftside== "NONE"
 #       lastcollection = getSubcollection(leftside,rightside)
 #     end
-
+#
 #     if rightside.include? "-"
 #       rightside=regularizeRightside(rightside)
 #       dashplace=4
@@ -228,7 +231,7 @@ end
 #   return [slidesMentioned,minslide,maxslide]
 #   #we begin by splitting our description up by subcollection.
 # end
-
+#
 ## The next few functions contributed to the failed attempt, and have been commented out.
 #  They may be useful in the future though, so we leave them in the file.
 # def prepareRanges(string)
@@ -288,18 +291,22 @@ end
 #   end
 #   return rightside
 # end
-
+#
 #The next function takes a slide categorization number and returns if it is an element of the 
 # VRC or Baly categorization system. It does not reference a database, but just uses the 
 # conventions of each to determine which it belongs to. Thus a slide C.400 would be sorted 
 # into the baly system even though no such slide exists. However we will check the prefix 
 # and some details about the suffix to raise errors as soon as possible.
-
+#
 #This function has been effectively replaced by the indexSystem attribute for classifications.
 # Once classificationData.rb includes every (known) slide in the collection,
 # this function will be improved to check against data and be more precise than inRange?.
 # Until then, get the classification system by entering 
 #  "Classification.new(classificationstring).indexSystem"
+
+# getCatType() 
+#   IN: a classification of a slide
+#   OUT: the system of this classification, either "VRC" or "Baly" or "N/A" (if not parseable)
 def getCatType(catnum)
   #first we use the prefix of the classification number (the bit before the decimal point) and make 
   # a first guess about the sort. This will allow us to check some more specific conventions for each
@@ -364,6 +371,11 @@ while testslide != "n"
     puts getCatType(testslide)
 end
 =end
+
+# generateUniqueFilename(title,extension)
+#   IN: A string title and a string file extension (default xls)
+#   OUT: a filename composed of the title, digits corresponding 
+#        with the current time, and the appropriate extension 
 def generateUniqueFilename(someTitle,filetype= "xls")
   title=cleanTitle(someTitle)
   time=Time.now
