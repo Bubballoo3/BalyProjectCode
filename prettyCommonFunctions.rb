@@ -15,6 +15,13 @@ Threeletterclassifications=["EJB"]
 #         1. Array of individual classifications contained in the ranges 
 #         2. Max of range
 #         3. Min of range         
+# The general formatting rules are simple, and quite flexible. 
+#   1. The first item must be a complete classification, ie, a B00 number or alphanumeric
+#   2. No half of a range can include more that 3 digits
+#   3. The second half of a range always carries the group from the first half, and never includes it
+# From these simple rules, we separate each range by commas, and omit common info where possible.
+# The sequence of ranges ends at the first period, allowing it to be integrated into notes.
+
 def parseSlideRange(instring)
     #this will be our array that we return at the end
     slidesMentioned=Array.new
@@ -129,17 +136,20 @@ end
 =begin #The following is a debug routine that allows you to repeatedly test ranges
 s= ""
 puts "a debug session has started. enter \"n\" at any time to end it"
-while s != "n"
+while s != "n\n"
   unless s== ""
-    puts parseSlideRange(s)
+    print parseSlideRange(s)
+    print "\n"
   end
   s=gets
 end
 =end
 
 
-######### Fresh Attempt using Classes ##########################################
-#the next functions, parseSlideRangeAttempt, prepareRanges, getsubcollection,findendplace, 
+# # These functions have been commented due to the above parseSlideRange function performing better.
+# # They are left in in case they become useful later
+# ######## Fresh Attempt using Classes ##########################################
+# the next functions, parseSlideRangeAttempt, prepareRanges, getsubcollection,findendplace, 
 # and regularizeRightSide are part of this attempt, currently unsuccessful.
 # The smaller functions may have other uses, but still need to be rigorously tested
 # def parseSlideRangeAttempt(string)
@@ -231,7 +241,6 @@ end
 #   return [slidesMentioned,minslide,maxslide]
 #   #we begin by splitting our description up by subcollection.
 # end
-#
 ## The next few functions contributed to the failed attempt, and have been commented out.
 #  They may be useful in the future though, so we leave them in the file.
 # def prepareRanges(string)
@@ -291,7 +300,7 @@ end
 #   end
 #   return rightside
 # end
-#
+
 #The next function takes a slide categorization number and returns if it is an element of the 
 # VRC or Baly categorization system. It does not reference a database, but just uses the 
 # conventions of each to determine which it belongs to. Thus a slide C.400 would be sorted 
@@ -393,48 +402,3 @@ def cleanTitle(title)
   title.gsub! "*",""
   return title
 end
-def generateSortingNumbers(array,altIDs=false)
-  if array.class == String
-    array=Array(array)
-  end
-  sortingNumbers=Array.new
-  balyIDs=Array.new
-  vrcIDs=Array.new
-  array.each do |cat|
-    if cat.class == NilClass
-      sortingNumbers.append ""
-    elsif cat.length < 2
-      sortingNumbers.append ""
-    elsif Threeletterclassifications.include? cat
-      sortingNumbers.append ""
-    elsif altIDs
-      slide=Slide.new(cat)
-      altid=indexConverter(slide.getindex)
-      if altid.class == Classification
-        slide.addAltID(altid)
-      end
-      vrcIDs.push slide.getindex("VRC").to_s
-      balyid=slide.getindex "Baly"
-      balyIDs.push balyid.to_s
-      sortingNumbers.push balyid.sortingNumber
-    else
-      classification=Classification.new(cat)
-      if classification.classSystem == "VRC"
-        altId=indexConverter(classification)
-        if altId.class == Classification
-          sortingNumbers.append altId.sortingNumber
-        else
-          sortingNumbers.append 0
-        end
-      else
-        sortingNumbers.append classification.sortingNumber
-      end
-    end
-  end
-  if altIDs
-    return [sortingNumbers,balyIDs,vrcIDs]
-  else
-    return sortingNumbers
-  end
-end
-
