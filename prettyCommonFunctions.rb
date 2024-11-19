@@ -8,8 +8,21 @@ Threeletterclassifications=["EJB"]
 # 
 # ASIDE: This is the key to time efficient data entry. There are many parts of the collection which are
 #        consistent in some aspect with unpredictable and varying interruptions (eg. classification methodology).
-#         
-def parseSlideRange(string)
+
+# parseSlideRange()
+#   IN: a series of comma separated ranges similar to A.001-002.
+#   OUT: A nested array containing three elements:
+#         1. Array of individual classifications contained in the ranges 
+#         2. Max of range
+#         3. Min of range         
+# The general formatting rules are simple, and quite flexible. 
+#   1. The first item must be a complete classification, ie, a B00 number or alphanumeric
+#   2. No half of a range can include more that 3 digits
+#   3. The second half of a range always carries the group from the first half, and never includes it
+# From these simple rules, we separate each range by commas, and omit common info where possible.
+# The sequence of ranges ends at the first period, allowing it to be integrated into notes.
+
+def parseSlideRange(instring)
     #this will be our array that we return at the end
     slidesMentioned=Array.new
   
@@ -20,11 +33,9 @@ def parseSlideRange(string)
     #Ranges are separated by commas, and common info is not repeated
     #an especially complicated example of this is 
     #"B27.012-15, B45.905-06, B47.654-63, 716-18"
+    string=instring.fullstrip
     if string.include? ". "
         n=string.index ". "
-        string=string[...n]
-      elsif string.include? ". "
-        n=string.index ". "
         string=string[...n]
     elsif string[-1]=="."
         string=string[...-1]
@@ -125,24 +136,26 @@ end
 =begin #The following is a debug routine that allows you to repeatedly test ranges
 s= ""
 puts "a debug session has started. enter \"n\" at any time to end it"
-while s != "n"
+while s != "n\n"
   unless s== ""
-    puts parseSlideRange(s)
+    print parseSlideRange(s)
+    print "\n"
   end
   s=gets
 end
 =end
 
 
-######### Fresh Attempt using Classes ##########################################
-#the next functions, parseSlideRangeAttempt, prepareRanges, getsubcollection,findendplace, 
+# # These functions have been commented due to the above parseSlideRange function performing better.
+# # They are left in in case they become useful later
+# ######## Fresh Attempt using Classes ##########################################
+# the next functions, parseSlideRangeAttempt, prepareRanges, getsubcollection,findendplace, 
 # and regularizeRightSide are part of this attempt, currently unsuccessful.
 # The smaller functions may have other uses, but still need to be rigorously tested
 # def parseSlideRangeAttempt(string)
 #   #this will be our array that we return at the end
 #   slidesMentioned=Array.new
 #   collectionsToIndex=Hash.new
-
 #   #we begin by splitting the ranges. 
 #   #Ranges are separated by commas, and common info is not repeated
 #   #an especially complicated example of this is 
@@ -153,9 +166,9 @@ end
 #   thousandslide= "NONE"
 #   #we now loop through the ranges and process them
 #   ranges.each do |range|
-    
+#    
 #     #the following will be a sample range to indicate which parts the code is handling
-    
+#    
 #     #B22.222-22  
 #     #   ^
 #     if range.include? "."
@@ -165,16 +178,16 @@ end
 #       rightside=range
 #       leftside= "NONE"
 #     end
-    
+#    
 #     #B22.222-22
 #     #^^^
-    
+#    
 #     #B22.222-22
 #     #       ^
 #     unless leftside== "NONE"
 #       lastcollection = getSubcollection(leftside,rightside)
 #     end
-
+#
 #     if rightside.include? "-"
 #       rightside=regularizeRightside(rightside)
 #       dashplace=4
@@ -228,76 +241,81 @@ end
 #   return [slidesMentioned,minslide,maxslide]
 #   #we begin by splitting our description up by subcollection.
 # end
-
-def prepareRanges(string)
-  if string.include? ". "
-    n=string.index ". "
-    string=string[...n]
-  end
-  ranges=string.split(",",-1)
-  for i in 0...ranges.length
-   ranges[i] = ranges[i].lfullstrip
-  end
-  return ranges
-end
-def getSubcollection(leftside,rightside)
-  dashplace=findendplace(rightside)
-  if dashplace < 3
-    lastcollection=Subcollection.new(leftside+"."+"0")
-  else
-    lastcollection=Subcollection.new(leftside+'.'+rightside[0])
-  end
-  return lastcollection 
-end
-def findendplace(rightside)
-  unless rightside.include? "-" 
-    count=0
-    endplace=rightside.length
-    rightside.each_char do |char|
-      if char.is_integer?
-        count+=1
-      else
-        endplace=count
-      end
-    end
-  else
-    endplace=rightside.index "-"
-  end
-  return endplace
-end
-def regularizeRightside(rightside)
-  endplace=findendplace(rightside)
-  while endplace < 3
-    puts endplace
-    rightside= "0"+rightside
-    endplace+=1
-  end
-  if rightside.include? "-"
-    lastpart=rightside.split("-")[1]
-    while lastpart[-1].is_integer? == false
-      lastpart=lastpart[0...-1]
-    end
-    count=0
-    while lastpart.length < 3
-      lastpart=rightside[count]+lastpart
-      count+=1
-      rightside=rightside[0..endplace]+lastpart
-    end
-  end
-  return rightside
-end
+## The next few functions contributed to the failed attempt, and have been commented out.
+#  They may be useful in the future though, so we leave them in the file.
+# def prepareRanges(string)
+#   if string.include? ". "
+#     n=string.index ". "
+#     string=string[...n]
+#   end
+#   ranges=string.split(",",-1)
+#   for i in 0...ranges.length
+#    ranges[i] = ranges[i].lfullstrip
+#   end
+#   return ranges
+# end
+# def getSubcollection(leftside,rightside)
+#   dashplace=findendplace(rightside)
+#   if dashplace < 3
+#     lastcollection=Subcollection.new(leftside+"."+"0")
+#   else
+#     lastcollection=Subcollection.new(leftside+'.'+rightside[0])
+#   end
+#   return lastcollection 
+# end
+# def findendplace(rightside)
+#   unless rightside.include? "-" 
+#     count=0
+#     endplace=rightside.length
+#     rightside.each_char do |char|
+#       if char.is_integer?
+#         count+=1
+#       else
+#         endplace=count
+#       end
+#     end
+#   else
+#     endplace=rightside.index "-"
+#   end
+#   return endplace
+# end
+# def regularizeRightside(rightside)
+#   endplace=findendplace(rightside)
+#   while endplace < 3
+#     puts endplace
+#     rightside= "0"+rightside
+#     endplace+=1
+#   end
+#   if rightside.include? "-"
+#     lastpart=rightside.split("-")[1]
+#     while lastpart[-1].is_integer? == false
+#       lastpart=lastpart[0...-1]
+#     end
+#     count=0
+#     while lastpart.length < 3
+#       lastpart=rightside[count]+lastpart
+#       count+=1
+#       rightside=rightside[0..endplace]+lastpart
+#     end
+#   end
+#   return rightside
+# end
 
 #The next function takes a slide categorization number and returns if it is an element of the 
 # VRC or Baly categorization system. It does not reference a database, but just uses the 
 # conventions of each to determine which it belongs to. Thus a slide C.400 would be sorted 
 # into the baly system even though no such slide exists. However we will check the prefix 
 # and some details about the suffix to raise errors as soon as possible.
-
+#
 #This function has been effectively replaced by the indexSystem attribute for classifications.
 # Once classificationData.rb includes every (known) slide in the collection,
 # this function will be improved to check against data and be more precise than inRange?.
 # Until then, get the classification system by entering 
 #  "Classification.new(classificationstring).indexSystem"
+
+# getCatType() 
+#   IN: a classification of a slide
+#   OUT: the system of this classification, either "VRC" or "Baly" or "N/A" (if not parseable)
 def getCatType(catnum)
   #first we use the prefix of the classification number (the bit before the decimal point) and make 
   # a first guess about the sort. This will allow us to check some more specific conventions for each
@@ -362,7 +380,12 @@ while testslide != "n"
     puts getCatType(testslide)
 end
 =end
-def generateUniqueFilename(filetype= "xls",someTitle)
+
+# generateUniqueFilename(title,extension)
+#   IN: A string title and a string file extension (default xls)
+#   OUT: a filename composed of the title, digits corresponding 
+#        with the current time, and the appropriate extension 
+def generateUniqueFilename(someTitle,filetype= "xls")
   title=cleanTitle(someTitle)
   time=Time.now
   minutes=time.min
@@ -379,48 +402,3 @@ def cleanTitle(title)
   title.gsub! "*",""
   return title
 end
-def generateSortingNumbers(array,altIDs=false)
-  if array.class == String
-    array=Array(array)
-  end
-  sortingNumbers=Array.new
-  balyIDs=Array.new
-  vrcIDs=Array.new
-  array.each do |cat|
-    if cat.class == NilClass
-      sortingNumbers.append ""
-    elsif cat.length < 2
-      sortingNumbers.append ""
-    elsif Threeletterclassifications.include? cat
-      sortingNumbers.append ""
-    elsif altIDs
-      slide=Slide.new(cat)
-      altid=indexConverter(slide.getindex)
-      if altid.class == Classification
-        slide.addAltID(altid)
-      end
-      vrcIDs.push slide.getindex("VRC").to_s
-      balyid=slide.getindex "Baly"
-      balyIDs.push balyid.to_s
-      sortingNumbers.push balyid.sortingNumber
-    else
-      classification=Classification.new(cat)
-      if classification.classSystem == "VRC"
-        altId=indexConverter(classification)
-        if altId.class == Classification
-          sortingNumbers.append altId.sortingNumber
-        else
-          sortingNumbers.append 0
-        end
-      else
-        sortingNumbers.append classification.sortingNumber
-      end
-    end
-  end
-  if altIDs
-    return [sortingNumbers,balyIDs,vrcIDs]
-  else
-    return sortingNumbers
-  end
-end
-

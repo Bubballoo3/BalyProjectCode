@@ -188,10 +188,10 @@ class Slide
     end
     #For this accessor, we accept the choice of which indexing is returned.
     #if a choice is not made, we default to the non-zero one or Baly ID 
-    def getindex(system=0)
-        if system== "Baly"
+    def getindex(system="none")
+        if system == "Baly"
             return @Balyid
-        elsif system== "VRC"
+        elsif system == "VRC"
             return @VRCid
         else
             [@Balyid,@VRCid].each do |id|
@@ -308,7 +308,7 @@ class Classification
             @input=classnumber
             (@group,@number) = classnumber
         else #if the input is not readable, we print a warning, and raise an error
-            raise ClassificationError.new "#{classnumber} is not a valid Classification object"
+            raise ClassificationError.new "'#{classnumber}' is not a valid Classification object"
         end
         stringnum=@number.to_s
         while stringnum.length < 3
@@ -406,7 +406,6 @@ class Location
     end
     #other methods
     def parseLocationArray(input)
-        print input
         tuple=input[0]
         data=input[1]
         arrlength=input.length
@@ -416,10 +415,10 @@ class Location
             if arrlength > 3
                 title=input[3]
             else
-                title=0
+                title= ""
             end
         else
-            notes=0
+            notes= ""
         end
         (latitude,longitude)=tuple
         return [latitude,longitude,data,notes,title]
@@ -473,7 +472,7 @@ class SpecificLocation < Location
         stringin=stringin.downcase
         if stringin.include?(" at ")
             (precisiondata,angledata)=stringin.split(" at ")
-            print precisiondata,angledata
+            #print precisiondata,angledata
         elsif stringin.include?(" facing ")
             (precisiondata,angledata)=stringin.split(" facing ")
         else
@@ -508,11 +507,12 @@ class SpecificLocation < Location
             else
                 elements=stringin.split(" ")
                 if elements.length < 3 
-                    raise StandardError.new "Attribute missing for location titled: \"#{parent.title}\""
+                    raise StandardError.new "Attribute missing for location titled: '#{parent.title}'"
                 end
-                (@degrees,middle,@direction)=elements
+                (degrees,middle,@direction)=elements
+                @degrees=degrees.to_i
                 if middle != "degrees"
-                    raise StandardError.new "word \'degrees\' not found/misplaced in angle data for location titled: \"#{parent.title}\""
+                    raise StandardError.new "word 'degrees' not found/misplaced in angle data for location titled: '#{parent.title}'"
                 end
             end
         end
@@ -520,9 +520,9 @@ class SpecificLocation < Location
             return @degrees
         end
         def direction()
-            return @direction
+            return @direction.upcase
         end
-        def to_s() 
+        def to_s()
             return @degrees.to_s+" degrees "+@direction.upcase
         end
     end
@@ -551,7 +551,7 @@ class Subcollection
                     if parts[1].length != 1 or parts[1].is_integer? == false
                         raise StandardError.new "The subcollection input value (after the point) for input #{input} can only be one integer"
                     else
-                        returnbool=true
+                        returnbool = true
                     end
                 end
             else
@@ -560,6 +560,7 @@ class Subcollection
         else
             raise StandardError.new "Subcollection input #{input} does not include a period, and cannot be parsed"
         end
+        return returnbool
     end
     def to_s()
         return @group+"."+@subgroup
@@ -577,19 +578,16 @@ class Subcollection
                 newsubgroup = subgroup+1
                 @subgroup=newsubgroup.to_s
             else
-                group=@group
+                group = @group
                 groupnumber=group[1..].to_i
                 groupnumber+=1
                 @group= "B"+groupnumber.to_s
                 @subgroup= "0"
             end
         else
-            subgroup=@subgroup.to_i
-            if subgroup!=0
-                raise StandardError.new "Baly Collections are all less than 200"
-            end
-            newsubgroup=subgroup+1
-            @subgroup=newsubgroup.to_s
+            value = @group.alphValue
+            startindex = AcceptableAlphanumerics.index @group
+            @group = AcceptableAlphanumerics[startindex+1]
         end
     end
     def isVRC?()

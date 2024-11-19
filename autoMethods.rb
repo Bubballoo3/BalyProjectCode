@@ -60,7 +60,7 @@ def fillJSON(indexfile,removeEmpty=true,overwrite=true)
     newrow[-1]=json
     newdata.push newrow
   end
-  newfilename=generateUniqueFilename("xls","JSONAdded")
+  newfilename=generateUniqueFilename("JSONAdded","xls")
   writeXLSfromRowArray(newfilename,newdata[1..],finalfields)
 end
 
@@ -73,11 +73,16 @@ def fillImageNotes(indexfile,overwrite=false)
     if row[-1].to_s.length > 3 and overwrite == false
       imNotes=row[-1]
     else
-      imNotes=writeImageNotes(row[1],row[2],row[3],row[4],row[5],row[6])
+      begin
+        imNotes=writeImageNotes(row[1],row[2],row[3],row[4],row[5],row[6])
+      rescue => e
+        puts "Encountered #{e.class} stating #{e.message} writing image notes for slide #{row[0]}"
+        imNotes= "None"          
+      end
     end
     newrow[-1]=imNotes
     newdata.push newrow
   end
-  newfilename=generateUniqueFilename("xls","ImageNotesAdded")
+  newfilename=generateUniqueFilename("ImageNotesAdded","xls")
   writeXLSfromRowArray(newfilename,newdata[1..],fields)
 end

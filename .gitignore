@@ -1,0 +1,8 @@
+# Ignore Excel files
+*.xls
+
+# Ignore JSON files
+*.json
+
+# Ignore KML files
+*.kml
