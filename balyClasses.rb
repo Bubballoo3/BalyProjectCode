@@ -578,7 +578,7 @@ class Subcollection
                 newsubgroup = subgroup+1
                 @subgroup=newsubgroup.to_s
             else
-                group=@group
+                group = @group
                 groupnumber=group[1..].to_i
                 groupnumber+=1
                 @group= "B"+groupnumber.to_s
