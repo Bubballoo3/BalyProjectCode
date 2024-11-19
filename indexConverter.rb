@@ -376,4 +376,16 @@ def generateSortingNumbers(array,altIDs=false)
     else
       return sortingNumbers
     end
+end
+
+=begin #The following is a debug routine that allows you to repeatedly test ranges
+s= ""
+puts "a debug session has started. enter \"n\" at any time to end it"
+while s != "n\n"
+  unless s== ""
+    print generateSortingNumbers(parseSlideRange(s)[0])
+    print "\n"
   end
+  s=gets
+end
+=end
