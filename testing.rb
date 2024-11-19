@@ -10,6 +10,7 @@
 require 'minitest'
 require 'minitest/autorun'
 
+# As the endpoint for users, the automethods.rb file contains the full project
 load 'autoMethods.rb'
 
 ##########################################################################################
@@ -423,45 +424,75 @@ class PrettyCommonFunctionsTester < Minitest::Test
   #         1. Array of individual classifications contained in the ranges 
   #         2. Max of range
   #         3. Min of range
+  # The general formatting rules are simple, and quite flexible. 
+  #   1. The first item must be a complete classification, ie, a B00 number or alphanumeric
+  #   2. No half of a range can include more that 3 digits
+  #   3. The second half of a range always carries the group from the first half, and never includes it
+  # From these simple rules, we separate each range by commas, and omit common info where possible.
+  # The sequence of ranges ends at the first period, allowing it to be integrated into notes.
   class ParseSlideRangeTester < PrettyCommonFunctionsTester
     # This function, on the other hand, is an important dependency for bigger
     # ones like indexConverter, and so is extensively tested.
     def test_best_case
-      assert_equal [["F.005","F.006","F.007","F.008"],"F.005","F.008"] , parseSlideRange("F.005-F.008")
+      a1=[["F.005","F.006","F.007","F.008"],"F.005","F.008"]
+      assert_equal  a1, parseSlideRange("F.005-008")
     end
     def test_normal_case
       # These are the conventions used in the ClassificationData.rb ranges
-      assert_equal [["A.001","A.002","A.003","A.004","A.005"],"A.001","A.005"], parseSlideRange("A.001-005")
+      # In this format, VRC ranges always have three digits after the decimal, and Baly ones typically have two (unless its 100).
+      a1=[["A.001","A.002","A.003","A.004","A.005"],"A.001","A.005"]
+      assert_equal a1, parseSlideRange("A.001-005")
+      a2=[["HI.042", "HI.043", "HI.044", "HI.045", "HI.046", "HI.047", "HI.048", "HI.049", "HI.050"], "HI.042", "HI.050"]
+      assert_equal a2, parseSlideRange("HI.42-50")
+      a3=[
+        ["B23.012", "B23.013", "B23.014", "B23.015", "B23.016", "B23.017", "B23.018", "B23.019", "B23.020", 
+         "B23.021", "B23.022", "B23.023", "B23.024", "B23.025", "B23.026", "B23.027", "B23.028", "B23.029", 
+         "B23.030", "B23.031", "B23.032", "B23.033", "B23.034", "B23.035", "B23.036", "B23.037", "B23.038", 
+         "B23.039", "B23.040", "B23.041", "B23.042", "B23.043"
+        ], 
+      "B23.012", "B23.043"
+      ]
+      assert_equal a3, parseSlideRange("B23.012-043")
+      a4=[["B02.300", "B02.301", "B02.302", "B02.303", "B02.304"], "B02.300", "B02.304"]
+      assert_equal a4, parseSlideRange("B02.300-304")
+      a5=[["A.090", "A.091", "A.092", "A.093", "A.094", "A.095", "A.096", "A.097", "A.098", "A.099", "A.100"], "A.090", "A.100"]
+      assert_equal a5, parseSlideRange("A.90-100")
     end
     def test_multiple_ranges
+      a1=[["A.001","B.002","B.003","B.004","C.002"],"A.001","C.002"]
+      assert_equal a1,parseSlideRange("A.01,B.002-4,C.2")
+      a2=[["A.003", "B.005", "B.006", "B.007", "C.010", "C.011", "C.012", "C.013", "C.014", 
+          "C.015", "C.016", "C.017", "C.018", "C.019", "C.020"], "A.003", "C.020"]
+      assert_equal a2,parseSlideRange("A.3,B.5-7,C.10-20")
     end
     def test_VRC_case
+      a1=[["B45.321","B45.322","B45.323","B45.324","B45.325","B45.326","B45.327","B45.328","B45.329","B45.330"],"B45.321","B45.330"]
+      assert_equal a1,parseSlideRange("B45.321-30")
+      a2=[["B32.034", "B32.035", "B32.036", "B32.037", "B32.038", "B32.039", "B32.040", "B32.041", "B32.042", "B32.043", "B43.004"], "B32.034", "B43.004"]
+      assert_equal a2,parseSlideRange("B23.013-8,B43.4,B32.034-43")
     end
     def test_long_range
+      pref= 'B43.'
+      arr=Array.new
+      (4..300).each do |i|
+        stri=i.to_s
+        while stri.length < 3
+          stri= "0"+stri
+        end
+        num=pref+stri
+        arr.push num
+      end
+      a1=[arr,"B43.004","B43.300"]
+      assert_equal a1,parseSlideRange("B43.004-300")
     end
     def test_singleton
+      assert_equal [["B43.004"],"B43.004","B43.004"],parseSlideRange("B43.004")
+      assert_equal [["B43.004"],"B43.004","B43.004"],parseSlideRange("B43.4")
+      assert_equal [["AF.042"],"AF.042","AF.042"],parseSlideRange("AF.42")
+      assert_equal "BG.001",parseSlideRange("BG.1")
     end
-    def test_all
+    # Expected errors
+    def test_na_conditions
     end
   end
 end
-
-  def testParseSlideRange()
-    expectations={
-      #Simple Case
-      #Multiple simple case
-      "A.01,B.002-4,C.2" => ["A.001","B.002","B.003","B.004","C.002"],
-      #VRC classification case
-      "B45.321-30" => ["B45.321","B45.322","B45.323","B45.324","B45.325","B45.326","B45.327","B45.328","B45.329","B45.330"]
-    }
-    expectations.each do |inp,res|
-      slideRangeExpect(inp,res)
-    end
-  end
-
-# classes=[BalyClassesTester.new,PrettyCommonFunctionsTester.new]
-# classes.each do |tester|
-#     puts "Testing #{tester.class}..."
-#     tester.testAll
-# end
-# puts "Testing Successfull as all modules have passed"
