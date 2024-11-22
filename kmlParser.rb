@@ -46,6 +46,24 @@ class KML
   def title
     return @title
   end
+
+  def assembleAnglesHash
+    linehash = Hash.new
+    @lines.each do |line|
+      (slide,required)=line.title.split(" ")
+      if required.downcase == "angle"
+          cat=Classification.new(parseSlideRange(slide)[0][0]).to_s
+        if cat.class == NilClass
+          print "The angle line for slide #{cat} could not be parsed, and has been skipped"
+        elsif cat.include? "ERROR"
+          print "The angle line for slide #{cat} could not be parsed, and has been skipped"
+        else
+          linehash[cat]=line.angle
+        end
+      end
+    end
+    return linehash
+  end
   class Placemark #Consisting of Point and Line subclasses, Placemarks are the basic unit of KML files
     def initialize(instring)
       @title = ""
@@ -212,7 +230,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
       location = point.coords
       #populate info
       mainsheet[i+2,0] = title
-      mainsheet[i+2,1] = location
+      mainsheet[i+2,1] = description
       mainsheet[i+2,2] = location[0]
       mainsheet[i+2,3] = location[1]
       finalindex=i
@@ -246,7 +264,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
   if mode == "CatNum"
     seenSlides=Hash.new
     points=kmlObject.points
-    linedirectory=assembleLineHash(kmlObject.lines)
+    linedirectory=kmlObject.assembleAngleHash
     #Loop through the points 
     points.length.times do |index|
       point = points[index]
@@ -274,12 +292,13 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
           puts index
           puts cat
           classification=Classification.new(cat).to_s
+          angle=linedirectory[classification]
           if seenSlides.include? classification
             slide=seenSlides[classification]
-            addLocationToSlide(slide,locationTuple,title,desc)
+            addLocationToSlide(slide,locationTuple,title,desc,angle)
           else  
             slide=Slide.new(classification)
-            addLocationToSlide(slide,locationTuple,title,desc)
+            addLocationToSlide(slide,locationTuple,title,desc,angle)
             altId=indexConverter(slide.getindex)
             if altId.class == Classification
               slide.addAltID(altId)
@@ -331,25 +350,11 @@ def swapSlideIdentifier(title,description)
   return [title,description]
 end
 
-def assembleLineHash(lines)
-  linehash=Hash.new
-  lines.each do |line|
-    (slide,required)=line.title.split(" ")
-    if required.downcase == "angle"
-        cat=Classification.new(parseSlideRange(slide)[0][0])
-        if cat.class == NilClass
-        print "The angle line for slide #{cat} could not be parsed, and has been skipped"
-      elsif cat.include? "ERROR"
-        print "The angle line for slide #{cat} could not be parsed, and has been skipped"
-      else
-        linehash[cat]=line
-      end
-    end
-  end
-end
-def addLocationToSlide(slide,locationTuple,title,desc)
+
+def addLocationToSlide(slide,locationTuple,title,desc,angle)
   puts "Description: #{desc}"
   data=stripData(desc)
+
   if data.class != Array
     notes=data
     slide.addLocation([locationTuple,title,notes],false,false)
@@ -398,6 +403,9 @@ def stripData(desc)
     end
     return [angledata,0 ]
   end
+end
+
+def findAngleDirection(angle)
 end
 
 def formatspreadsheet(sheet)
