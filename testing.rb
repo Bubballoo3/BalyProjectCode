@@ -96,7 +96,7 @@ class BalyClassesTester < Minitest::Test
       # Test initialization
         # Standard syntax
       assert_equal "B.005",@c.to_s
-      assert_equal "CD.055",@d.to_s
+      assert_equal "CD.054",@d.to_s
         # Nonstandard syntax
       assert_equal "B34.003",@e.to_s
       assert_equal "F.042",@f.to_s
@@ -489,10 +489,119 @@ class PrettyCommonFunctionsTester < Minitest::Test
       assert_equal [["B43.004"],"B43.004","B43.004"],parseSlideRange("B43.004")
       assert_equal [["B43.004"],"B43.004","B43.004"],parseSlideRange("B43.4")
       assert_equal [["AF.042"],"AF.042","AF.042"],parseSlideRange("AF.42")
-      assert_equal "BG.001",parseSlideRange("BG.1")
+      assert_equal [["BG.001"],"BG.001","BG.001"],parseSlideRange("BG.1")
     end
-    # Expected errors
-    def test_na_conditions
+  end
+
+  class GenerateSortingNumbersTester < PrettyCommonFunctionsTester
+    def test_random
+      
+    end
+  end
+end
+
+##########################################################################################
+# kmlParser.rb
+
+class KmlParserTester < Minitest::Test
+  class KMLTester < KmlParserTester
+    def setup
+      tempkml1 = Tempfile.new(['testobj1','.kml'])
+      #@samplekml2= "<Document> \n <name>BG - Kermanshah and Bisutun</name> \n     <Placemark> \n <name>Kermanshah</name> \n  <description>BG.001-06</description> \n  <styleUrl>#icon-1899-0288D1</styleUrl> \n      <Point> \n        <coordinates>\n          47.0777685,34.3276924,0\n        </coordinates>\n      </Point>\n    </Placemark>     <Placemark>\n      <name>BG.06 - Kurds on Route to Kermanshah</name>\n      <description>Possible Location. The mountains in the background allow us to place this image northwest of Kermanshah, facing the mountains. However the location given is not precise beyond this, and just a guess at a spot along a major road.</description> \n      <styleUrl>#icon-1899-0288D1</styleUrl>\n      <Point>\n        <coordinates>\n          47.0810041,34.3881913,0\n        </coordinates>\n      </Point>\n    </Placemark>"
+      samplekml1= "<?xml?>
+      <kml>
+        <Document>
+          <name>BG - Kermanshah and Bisutun</name>
+          <Style>
+            <IconStyle>
+              <color>ffd18802</color>
+              <scale>1</scale>
+              <Icon>
+                <href>https://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png</href>
+              </Icon>
+              <hotSpot>
+            </IconStyle>
+            <LabelStyle>
+              <scale>0</scale>
+            </LabelStyle>
+          </Style>    
+          <Placemark>
+            <name>Kermanshah</name>
+            <description>BG.001-06</description>
+            <styleUrl>#icon-1899-0288D1</styleUrl>
+            <Point>
+              <coordinates>
+                47.0777685,34.3276924,0
+              </coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>BG.06 - Kurds on Route to Kermanshah</name>
+            <description>Possible Location. The mountains in the background allow us to place this image northwest of Kermanshah, facing the mountains. However the location given is not precise beyond this, and just a guess at a spot along a major road.</description>
+            <styleUrl>#icon-1899-0288D1</styleUrl>
+            <Point>
+              <coordinates>
+                47.0810041,34.3881913,0
+              </coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>BG.06 Angle</name>
+            <styleUrl>#line-000000-1200-nodesc</styleUrl>
+            <LineString>
+              <tessellate>1</tessellate>
+              <coordinates>
+                47.0810041,34.3881913,0
+                47.0317336,34.4425962,0
+              </coordinates>
+            </LineString>
+          </Placemark>
+          <Placemark>
+            <name>BG.29 - Inscription of Darius I</name>
+            <description>Estimated Location</description>
+            <styleUrl>#icon-1899-0288D1</styleUrl>
+            <Point>
+              <coordinates>
+                47.4363682,34.390528,0
+              </coordinates>
+            </Point>
+          </Placemark>
+          <Placemark>
+            <name>BG.29 Angle</name>
+            <styleUrl>#line-000000-1200-nodesc</styleUrl>
+            <LineString>
+              <tessellate>1</tessellate>
+              <coordinates>
+                47.4363682,34.390528,0
+                47.4362534,34.3904965,0
+              </coordinates>
+            </LineString>
+          </Placemark>
+        </Document>
+      </kml>"
+      IO.write('testing.kml',samplekml1)
+      @kml = KML.new('testing.kml')
+      @stringkml= KML.new(samplekml1)
+      File.delete('testing.kml')
+    end
+
+    def test_basic
+      doctitle= "BG - Kermanshah and Bisutun"
+      # Check attributes. The two KML objects should be equal in every respect so we check them both
+      assert_equal doctitle, @kml.title
+      assert_equal doctitle, @stringkml.title
+      assert_equal 3, @kml.points.length
+      assert_equal 3, @stringkml.points.length
+      assert_equal 2, @kml.lines.length
+      assert_equal 2, @stringkml.lines.length
+    end
+
+    def test_points
+      points= @kml.points
+      genpt=points[0]
+      assert_equal "Kermanshah", genpt.title
+      assert_equal "BG.001-06", genpt.description
+      assert_equal "[34.3276924, 47.0777685]", genpt.coords.to_s
     end
   end
 end

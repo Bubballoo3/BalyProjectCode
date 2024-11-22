@@ -2,7 +2,6 @@
 #make sure you're in the right directory when you run this 
 # or it won't be able to find the file
 require_relative 'indexConverter.rb'
-#a purely original attempt
 
 class Slide
   def addGeodata()
@@ -22,149 +21,139 @@ class String
   end
 end
 
-#filename="UnitedKingdom.kml"
-
-#This function reads a kml file and returns a series of hashes containing all the 
-# relevant information. It indexes each placemark by an integer, which is used as 
-# a key for that info in each hash           
-def stripInfo(kmlFilename)
-  collectioninfo=Array.new
-
-  titles=Hash.new
-  descriptions=Hash.new
-  locations=Hash.new
-  lines=Hash.new
-
-  #Determine which file to read
-  filename=kmlFilename
-
-#define control variables
-  num=0
-  header=false
-  cordsread=false
-  lineread=false
-  linecords=Array.new
-  doctitle= "Title Field Blank"
-
-#open file
-  file=File.open(filename)
-
-  index=0
-  cordnum=0
-#read file one line at a time (master loop)
-  File.readlines(file).each do |rawline|
-    #we begin by collecting all the important file and collection info and putting it into an array
-
-    #first we clean any non-standard space characters out of the string
-    line=rawline.cleanSpaces
-    #Our first task is to collect the title of each entry
-    #every title includes "<name>" and ends with "<\name>"
-    if line.include? "<name>" and header==false
-      if line.include? "</name>"
-        endline=line.rindex "<"
-      else 
-        endline=line.rindex "\n"
-      end
-      #titles including special characters have additional identifiers that must be removed 
-      if line.include? "CDATA"
-        splitline=line[21...endline-3]
- 
-      #the normal titles get cleaned here  
-      else splitline=line[12...endline]
-      end
-
-      #items at the beginning and end of collections begin "(BXX)"
-      #this also must be removed
-      if splitline.include? "(B"
-        splitline=splitline[6...]
-      end
-      title=splitline
-      titles[index] = title
+class KML
+  def initialize(filename)
+    @title= ""
+    @points=[]
+    @lines=[]
+    if filename[-4..-1] == ".kml"
+      instring = File.read(filename)
+    else 
+      instring=filename
     end
-    
-    #we now collect the collection name. This will be the first element of the list we return
-    if header==true
-      start=line.index ">"
-      start=start+1
-      finish=line.rindex "<"
-      doctitle=line[start...finish]
-      header=false
-    end 
+    parseKML(instring)
+  end
 
-    if line.include? "<Document>"
-      header=true
+  def points
+    return @points
+  end
+
+  def lines
+    return @lines
+  end
+
+  def title
+    return @title
+  end
+  class Placemark
+    def initialize(instring)
+      @title = ""
+      @description = ""
+      @coords=[]
+      @coordsNext=false  
+      lines=instring.split("\n")
+      lines.each do |line|
+        parseAttrs line
+      end
     end
 
-    #we begin with descriptions
-    #search for our keyword
-    if line.include? "<description>"
-      endline=line.rindex "<"
-      #split the line
-      if line.include? "CDATA" #if the line contains special characters, we need to remove more
-        splitline=line[28...endline-3]
-      else
-        splitline=line[19...endline]
-      end
-      activeDesc=splitline
-      #reference our hashkeys list and create an entry in the descriptions hash
-      descriptions[index]=activeDesc
-    end
-
-    #we then perform a simiilar process with the coordinates
-
-  
-    if cordsread==true
-      cords=line[..-4]
-      if lineread==false
-        locations[index]=cords.lstrip!
-        cordsread=false
-      else
-        if cordnum < 2
-          linecords.push cords.lstrip!
-          cordnum+=1
+    def parseAttrs(line)
+      if line.include? "<name>"
+        @title = cleanline line
+      elsif line.include? "<description>"
+        @description = cleanline line
+      elsif line.include? "<coordinates>"
+        @coordsNext = true
+      elsif line.include? "</coordinates>"
+        @coordsNext = false
+      elsif @coordsNext
+        bigcords=line.split ","
+        latitude=bigcords[1].to_f
+        longitude=bigcords[0].lfullstrip.to_f
+        if @coords.to_s.length > 3
+          (prevLat,prevLong)=@coords
+          @coords=[[prevLat,prevLong],[latitude,longitude]]
         else
-          lines[index] = linecords
-          cordsread=false
+          @coords=[latitude,longitude]
         end
-      end 
-    end
-
-    if line.include? "<coordinates>"
-      cordsread=true
-      cordnum=0
-    end
-    
-    if line.include? "<LineString>"
-      lineread=true
-      linecords=[]
-    end
-
-    #when we reach the end of an entry, we advance the index
-    if line.include? "</Placemark>"
-      if lineread
-        lineread=false
-      else 
-        index=index+1
       end
-      puts "Working, current index #{index}"
+    end
+
+    def cleanline(line)
+      start=line.index ">"
+      start+=1
+      last=line.rindex "<"
+      return line[start...last].fullstrip
+    end
+
+    def title
+      return @title
+    end
+
+    def description
+      return @description
+    end
+
+    def coords
+      return @coords
     end
   end
-  file.close()
-  return[doctitle,titles,descriptions,locations,lines]
+
+  class Point < Placemark
+  end
+
+  class Line < Placemark
+    Pi = 3.141592653
+    def angle
+      if @coords[0][0]==@coords[1][0]
+        return 0
+      end
+      (dy,dx)=[@coords[1][1]-@coords[0][1],@coords[1][0]-@coords[0][0]]
+      radangle=Math.atan(dy/dx)
+      degangle= radangle * (180/Pi)
+      remainder=degangle % 5
+      if remainder > 2
+        rounded = degangle-remainder+5
+      else
+        rounded =  degangle - remainder
+      end
+      if rounded < 0
+        rounded=rounded+360
+      end
+      if dy < 0
+        rounded+=180
+      end
+      return rounded.to_i
+    end
+  end
+
+  private
+  def parseKML(instring)
+    tempstring= ""
+    reading = false
+    lines=instring.split "\n"
+    lines.each do |line|
+      if line.include? "</Placemark>"
+        reading = false
+        if tempstring.include? "<LineString>"
+          newline=Line.new tempstring
+          @lines.push newline
+        elsif tempstring.include? "<Point>"
+          newpoint=Point.new tempstring
+          @points.push newpoint
+        end
+        tempstring=String.new
+      elsif reading
+        tempstring+=line+"\n"
+      elsif line.include? "<name>" and @title.to_s.length == 0
+        @title=line[line.index(">")+1...line.rindex("<")]
+      elsif line.include? "<Placemark>"
+        reading = true
+      end
+    end
+  end
 end
-
-
-#puts allinfo
-
-=begin
-for i in 1..allinfo[0].length
-
- if allinfo[1][allinfo[0][i]].class == String
-  #puts "the "+i.to_s+"th description is a string" 
-  puts "TITLE "+allinfo[0][i]+" HAS DESCRIPTION "+allinfo[1][allinfo[0][i]]
- end
-end
-=end 
+ 
 def splitLocations (stringLocation)
   if stringLocation.class != String
     return ["there has been an error","like actually"]
