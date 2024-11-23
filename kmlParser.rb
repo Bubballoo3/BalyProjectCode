@@ -125,24 +125,51 @@ class KML
     Pi = 3.141592653
     def angle
       if @coords[0][0]==@coords[1][0]
-        return 0
+        return "0 degrees N"
       end
-      (dy,dx)=[@coords[1][1]-@coords[0][1],@coords[1][0]-@coords[0][0]]
+      dy = @coords[1][0]-@coords[0][0]
+      dx = @coords[1][1]-@coords[0][1]
       radangle=Math.atan(dy/dx)
+      puts dy
       degangle= radangle * (180/Pi)
       remainder=degangle % 5
+      if degangle < 0
+        degangle=degangle+360
+      end
       if remainder > 2
         rounded = degangle-remainder+5
       else
         rounded =  degangle - remainder
       end
-      if rounded < 0
-        rounded=rounded+360
-      end
       if dy < 0
-        rounded+=180
+        rounded= (rounded+180) % 360
       end
-      return rounded.to_i
+      return rounded.to_i.to_s + " degrees " + get_angle_direction(rounded.to_i)
+    end
+    private
+    def get_angle_direction(degrees)
+      remainder=(degrees+23) % 45
+      sum=(degrees-remainder + 68)
+      case sum
+        when (0..45)
+          dir = "N"
+        when (46..90)
+          dir = "NE"
+        when (91..135)
+          dir = "E"
+        when (136..180)
+          dir = "SE"
+        when (180..225)
+          dir = "S"
+        when (226..270)
+          dir = "SW"
+        when (271..315)
+          dir = "W"
+        when (316..360)
+          dir = "NW"
+        else dir = ""   
+      end
+      return dir
     end
   end
 
@@ -203,7 +230,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
   mainsheet=book.create_worksheet
   
   #we then collect the title of the group and name our sheet after it
-  collectionTitle=bigarray[0]
+  collectionTitle=kmlObject.title
   mainsheet.name = collectionTitle
 
   #we define a disclaimer to populate the top left cell, identifying that it was produced by code
@@ -264,7 +291,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
   if mode == "CatNum"
     seenSlides=Hash.new
     points=kmlObject.points
-    linedirectory=kmlObject.assembleAngleHash
+    linedirectory=kmlObject.assembleAnglesHash
     #Loop through the points 
     points.length.times do |index|
       point = points[index]
@@ -272,7 +299,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
       desc = point.description
       if desc.length == 0
         raise StandardError.new "Kml entry at index #{index} with title #{title} does not have a description"
-      elsif desc.hasDirection? and title.include? "."
+      elsif title.include? "."
         if title.index(".") < 4
           (title,desc)=swapSlideIdentifier(title,desc)
           puts "swapped"
@@ -280,7 +307,7 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
       end
       puts title,desc
 
-      locationTuple=point.location 
+      locationTuple=point.coords 
       slidesarray = parseSlideRange(desc)[0]
       slidesarray.each do |cat|
         if cat.class == NilClass
@@ -293,12 +320,25 @@ def writeToXlsWithClass(kmlObject, mode="straight", filename="blank",fillBlanks=
           puts cat
           classification=Classification.new(cat).to_s
           angle=linedirectory[classification]
+          if angle.class != NilClass and desc[0..desc.index(". ")].downcase.include? "location"
+            if desc[0..desc.index(". ")].include? "location"
+              parts=desc.split("location")
+            elsif desc[0..desc.index(". ")].include? "Location"
+              parts=desc.split("Location")
+            end
+            runningdesc= ""
+            parts.insert(1,"location at "+angle)
+            parts.length.times do |i|
+              runningdesc += parts[i]
+            end
+            desc=runningdesc
+          end
           if seenSlides.include? classification
             slide=seenSlides[classification]
-            addLocationToSlide(slide,locationTuple,title,desc,angle)
+            addLocationToSlide(slide,locationTuple,title,desc)
           else  
             slide=Slide.new(classification)
-            addLocationToSlide(slide,locationTuple,title,desc,angle)
+            addLocationToSlide(slide,locationTuple,title,desc)
             altId=indexConverter(slide.getindex)
             if altId.class == Classification
               slide.addAltID(altId)
@@ -351,10 +391,9 @@ def swapSlideIdentifier(title,description)
 end
 
 
-def addLocationToSlide(slide,locationTuple,title,desc,angle)
+def addLocationToSlide(slide,locationTuple,title,desc)
   puts "Description: #{desc}"
   data=stripData(desc)
-
   if data.class != Array
     notes=data
     slide.addLocation([locationTuple,title,notes],false,false)
