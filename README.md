@@ -4,6 +4,7 @@
 ## How to Open and Run in a Terminal
 * ****Install Ruby****
   - Mac instructions
+    
     Open a terminal window, and type the following commands 
     ```sh
     echo 'if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi' >> ~/.zshrc
@@ -22,10 +23,11 @@
     ruby 3.3.5 (2023-12-25 revision 5124f9ac75) [x86_64-darwin20]
     ```
   - Windows instructions
+    
     Download the installer at [https://rubyinstaller.org/](https://rubyinstaller.org/)
 
   - Linux instructions
-    
+
   Then we install dependencies with the command
   ```sh
   bundle install
